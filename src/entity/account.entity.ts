@@ -16,30 +16,39 @@ export class Account {
     name: 'account_id',
     primaryKeyConstraintName: 'PK_ACCOUND_ID',
   })
-  accountId: bigint;
+  private _id: bigint;
 
   @Column({
+    name: 'email',
     unique: true,
   })
-  email: string;
+  private _email: string;
 
-  @Column()
-  password: string;
+  @Column({
+    name: 'phone',
+    unique: true,
+  })
+  private _phone: string;
+
+  @Column({
+    name: 'password',
+  })
+  private _password: string;
 
   @CreateDateColumn({
     name: 'created_at',
   })
-  createdAt: Date;
+  private _createdAt: Date;
 
   @UpdateDateColumn({
     name: 'updated_at',
   })
-  updatedAt: Date;
+  private _updatedAt: Date;
 
   @DeleteDateColumn({
     name: 'delete_at',
   })
-  deletedAt: Date;
+  private _deletedAt: Date;
 
   private constructor() {}
 
@@ -48,20 +57,50 @@ export class Account {
    *
    * @static
    * @param {string} email
+   * @param {string} phone
    * @param {string} password
    * @return {*}  {Account}
    * @memberof Account
    */
-  static of(email: string, password: string): Account {
+  static of(email: string, phone: string, password: string): Account {
     const account = new Account();
-    account.email = email;
-    account.password = password;
+    account._email = email;
+    account._phone = phone;
+    account._password = password;
     return account;
+  }
+
+  get id() {
+    return this._id;
+  }
+
+  set id(id: bigint) {
+    this._id = id;
+  }
+
+  get email() {
+    return this._email;
+  }
+
+  get phone() {
+    return this._phone;
+  }
+
+  set phone(phone: string) {
+    this._phone = phone;
+  }
+
+  get password() {
+    return this._password;
+  }
+
+  set password(password: string) {
+    this._password = password;
   }
 
   @BeforeInsert()
   @BeforeUpdate()
-  async hashPassword() {
+  private async hashPassword() {
     this.password = await bcrypt.hashSync(this.password, 10);
   }
 }
