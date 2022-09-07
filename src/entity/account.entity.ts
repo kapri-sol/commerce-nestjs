@@ -46,11 +46,11 @@ export class Account {
   private _updatedAt: Date;
 
   @DeleteDateColumn({
-    name: 'delete_at',
+    name: 'deleted_at',
   })
   private _deletedAt: Date;
 
-  private constructor() {}
+  constructor() {}
 
   /**
    * Account 인스턴스를 생성한다.
@@ -86,7 +86,7 @@ export class Account {
     return this._phone;
   }
 
-  set phone(phone: string) {
+  changePhone(phone: string) {
     this._phone = phone;
   }
 
@@ -94,13 +94,13 @@ export class Account {
     return this._password;
   }
 
-  set password(password: string) {
+  changePassword(password: string) {
     this._password = password;
   }
 
   @BeforeInsert()
   @BeforeUpdate()
   private async hashPassword() {
-    this.password = await bcrypt.hashSync(this.password, 10);
+    this._password = await bcrypt.hashSync(this.password, 10);
   }
 }
