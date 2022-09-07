@@ -18,6 +18,7 @@ export class AccountRepository {
     return this.accountRepository
       .createQueryBuilder('account')
       .where('account.account_id = :id', { id: id.toString() })
+      .where('account.deleted_at is null')
       .getOne();
   }
 
@@ -25,7 +26,12 @@ export class AccountRepository {
     return this.accountRepository
       .createQueryBuilder('account')
       .where('account.email = :email', { email })
+      .where('account.deleted_at is null')
       .getOne();
+  }
+
+  async softRemove(account: Account): Promise<void> {
+    await this.accountRepository.softRemove(account);
   }
 
   clear() {
