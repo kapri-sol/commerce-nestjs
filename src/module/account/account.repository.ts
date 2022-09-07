@@ -28,10 +28,6 @@ export class AccountRepository {
       .getOne();
   }
 
-  findAll() {
-    return this.accountRepository.find();
-  }
-
   clear() {
     return this.accountRepository.clear();
   }

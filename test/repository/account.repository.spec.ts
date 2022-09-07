@@ -133,31 +133,5 @@ describe('Account Repository', () => {
       // then
       expect(findAccount).toMatchObject(account);
     });
-
-    it('모든 Account를 검색한다.', async () => {
-      // given
-      const email = faker.internet.email();
-      const password = faker.internet.password();
-      const phone = faker.phone.number('+82 10-####-####');
-      const account = Account.of(email, phone, password);
-      await accountRepository.save(account);
-
-      const email2 = faker.internet.email();
-      const password2 = faker.internet.password();
-      const phone2 = faker.phone.number('+82 10-####-####');
-      const account2 = Account.of(email2, phone2, password2);
-      await accountRepository.save(account2);
-
-      // when
-      const findAccount = await accountRepository.findAll();
-
-      // then
-      expect(findAccount).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining(account),
-          expect.objectContaining(account2),
-        ]),
-      );
-    });
   });
 });
