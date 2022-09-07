@@ -74,10 +74,9 @@ describe('Account Repository', () => {
       const updatePhone = faker.phone.number();
 
       // when
-      account.phone = updatePhone;
+      account.changePhone(updatePhone);
       await accountRepository.save(account);
 
-      console.log(account.phone);
       // then
       expect(account.phone).toBe(updatePhone);
     });
@@ -91,7 +90,7 @@ describe('Account Repository', () => {
       await accountRepository.save(account);
 
       // when
-      account.password = updatePassword;
+      account.changePassword(updatePassword);
       await accountRepository.save(account);
 
       // then
@@ -132,6 +131,25 @@ describe('Account Repository', () => {
 
       // then
       expect(findAccount).toMatchObject(account);
+    });
+  });
+
+  describe('remove', () => {
+    it('id로 Account를 삭제한다.', async () => {
+      // given
+      const email = faker.internet.email();
+      const password = faker.internet.password();
+      const phone = faker.phone.number('+82 10-####-####');
+      const account = Account.of(email, phone, password);
+
+      await accountRepository.save(account);
+      // when
+      await accountRepository.softRemove(account);
+
+      const findAccount = await accountRepository.findOneById(account.id);
+
+      // then
+      expect(findAccount).toBeNull();
     });
   });
 });
