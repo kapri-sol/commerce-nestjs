@@ -19,6 +19,17 @@ export class AccountService {
     return createAccount.id;
   }
 
+  /**
+   * 계정을 id로 검색한다.
+   *
+   * @param {bigint} accountId
+   * @return {*}  {Promise<Account>}
+   * @memberof AccountService
+   */
+  findAccountById(accountId: bigint): Promise<Account> {
+    return this.accountRepository.findOneById(accountId);
+  }
+
     await this.accountRepository.save(account);
     return account.id;
   }
