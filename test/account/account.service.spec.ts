@@ -65,13 +65,31 @@ describe('Account Service', () => {
     });
   });
 
-      const account = await accountService.createAccount(createAccountDto);
-
-      console.log(account);
+  describe('findAccount', () => {
+    it('id로 계정을 검색한다.', async () => {
+      // given
+      const accountId = initialAccount.id;
 
       // when
-      //   expect(accountService.createAccount(createAccountDto));
+      const findAccount = await accountService.findAccountById(accountId);
+
       // then
+      expect(findAccount.id).toBe(accountId);
+      expect(findAccount.email).toBe(initialAccount.email);
+      expect(findAccount.phone).toBe(initialAccount.phone);
+      expect(findAccount.password).toStrictEqual(expect.any(String));
+    });
+
+    it('email로 계정을 검색한다.', async () => {
+      // given
+      const email = initialAccount.email;
+      // when
+      const findAccount = await accountService.findAccountByEmail(email);
+      // then
+      expect(findAccount.id).toBe(initialAccount.id);
+      expect(findAccount.email).toBe(email);
+      expect(findAccount.phone).toBe(initialAccount.phone);
+      expect(findAccount.password).toStrictEqual(expect.any(String));
     });
   });
 });
