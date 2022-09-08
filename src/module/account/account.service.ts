@@ -57,12 +57,23 @@ export class AccountService {
     udpateAccountDto: UpdateAccountDto,
   ): Promise<void> {
     const account = await this.accountRepository.findOneById(accountId);
+
+    if (!account) {
+      throw new NotFoundErorr();
+    }
+
     account.changePhone(udpateAccountDto.phone);
     account.changePassword(udpateAccountDto.password);
     await this.accountRepository.save(account);
   }
 
   async deleteAccountById(accountId: bigint): Promise<void> {
-    await this.accountRepository.findOneById(accountId);
+    const account = await this.accountRepository.findOneById(accountId);
+
+    if (!account) {
+      throw new NotFoundErorr();
+    }
+
+    await this.accountRepository.softRemove(account);
   }
 }
