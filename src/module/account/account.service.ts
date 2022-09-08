@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import { Account } from 'src/entity/account.entity';
+import { NotFoundErorr } from 'src/error/not-found.error';
 import { AccountRepository } from './account.repository';
 import { CreateAccountDto } from './dto/create.dto';
+import { UpdateAccountDto } from './dto/update.dto';
 
 @Injectable()
 export class AccountService {
@@ -59,5 +62,7 @@ export class AccountService {
     await this.accountRepository.save(account);
   }
 
+  async deleteAccountById(accountId: bigint): Promise<void> {
+    await this.accountRepository.findOneById(accountId);
   }
 }
