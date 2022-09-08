@@ -12,10 +12,14 @@ import {
 import { faker } from '@faker-js/faker';
 import { plainToInstance } from 'class-transformer';
 import { Account } from 'src/entity/account.entity';
+import { UpdateAccountDto } from 'src/module/account/dto/update.dto';
+import { NotFoundErorr } from 'src/error/not-found.error';
 
 describe('Account Service', () => {
+  let mockedAccountRepository: AccountRepository;
   let accountRepository: AccountRepository;
   let accountService: AccountService;
+
   const initialAccount = plainToInstance(Account, {
     _id: BigInt(1),
     _email: faker.internet.email(),
@@ -23,16 +27,20 @@ describe('Account Service', () => {
     _password: faker.internet.password(),
   });
 
-  const saveAccount = (account?: Partial<Account>) =>
-    plainToInstance(Account, {
-      id: account?.id || BigInt(Math.floor(Math.random() * 100)),
-      email: account?.email,
-      phone: account?.phone,
-      passsword: account?.password,
+  const saveAccount = (account?: Partial<Account>) => {
+    return plainToInstance(Account, {
+      _id: account?.id || BigInt(Math.floor(Math.random() * 100)),
+      _email: account?.email,
+      _phone: account?.phone,
+      _password: account?.password,
     });
+  };
+
+  beforeAll(() => {
+    mockedAccountRepository = mock(AccountRepository);
+  });
 
   beforeEach(() => {
-    const mockedAccountRepository = mock(AccountRepository);
     when(mockedAccountRepository.save(anyOfClass(Account))).thenResolve(
       saveAccount(),
     );
@@ -42,6 +50,8 @@ describe('Account Service', () => {
     when(mockedAccountRepository.findOneById(anything())).thenResolve(
       initialAccount,
     );
+
+    when(mockedAccountRepository.softRemove(anything())).thenResolve(undefined);
 
     accountRepository = instance(mockedAccountRepository);
     accountService = new AccountService(accountRepository);
@@ -138,6 +148,29 @@ describe('Account Service', () => {
         accountService.updateAccount(accountId, updateAccountDto);
       // then
       expect(updateAccount).rejects.toThrowError(NotFoundErorr);
+    });
+  });
+
+  describe('deleteAccount', () => {
+    it('계정을 id로 삭제한다.', async () => {
+      // given
+      const accountId = initialAccount.id;
+      // when
+      const deleteAccount = () => accountService.deleteAccountById(accountId);
+      // then
+      expect(deleteAccount).not.toThrow();
+    });
+
+    it('존재하지 않는 계정을 삭제하면, NotFoundError를 던진다.', async () => {
+      // given
+      const accountId = initialAccount.id;
+      when(mockedAccountRepository.findOneById(anything())).thenResolve(null);
+
+      // when
+      const deleteAccount = () => accountService.deleteAccountById(accountId);
+
+      // then
+      expect(deleteAccount).rejects.toThrowError(NotFoundErorr);
     });
   });
 });
