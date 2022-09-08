@@ -68,6 +68,13 @@ export class AccountService {
     return this.accountRepository.save(account);
   }
 
+  /**
+   * 계정을 id로 삭제한다.
+   *
+   * @param {bigint} accountId
+   * @return {*}  {Promise<void>}
+   * @memberof AccountService
+   */
   async deleteAccountById(accountId: bigint): Promise<void> {
     const account = await this.accountRepository.findOneById(accountId);
 
