@@ -9,7 +9,13 @@ import { Account } from 'src/entity/account.entity';
 describe('Account Service', () => {
   let accountRepository: AccountRepository;
   let accountService: AccountService;
-  let saveAccount = (account?: Partial<Account>) =>
+  const initialAccount = plainToInstance(Account, {
+    _id: BigInt(1),
+    _email: faker.internet.email(),
+    _phone: faker.phone.number('+82 10-####-####'),
+    _password: faker.internet.password(),
+  });
+
     plainToInstance(Account, {
       id: account?.id || BigInt(1),
       email: account?.email,
