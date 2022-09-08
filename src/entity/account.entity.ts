@@ -5,10 +5,12 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  OneToOne,
   UpdateDateColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { PrimaryGenerateBigintColumn } from 'src/decorator/primary-generate-bigint-column.decorator';
+import { Customer } from './customer.entity';
 
 @Entity()
 export class Account {
@@ -17,6 +19,9 @@ export class Account {
     primaryKeyConstraintName: 'PK_ACCOUND_ID',
   })
   private _id: bigint;
+
+  @OneToOne(() => Customer, (customer: Customer) => customer)
+  private _customer: Customer;
 
   @Column({
     name: 'email',
@@ -50,8 +55,6 @@ export class Account {
   })
   private _deletedAt: Date;
 
-  constructor() {}
-
   /**
    * Account 인스턴스를 생성한다.
    *
@@ -76,6 +79,14 @@ export class Account {
 
   set id(id: bigint) {
     this._id = id;
+  }
+
+  get customer() {
+    return this._customer;
+  }
+
+  set customer(customer: Customer) {
+    this._customer = customer;
   }
 
   get email() {
