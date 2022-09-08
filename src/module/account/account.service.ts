@@ -30,6 +30,17 @@ export class AccountService {
     return this.accountRepository.findOneById(accountId);
   }
 
+  /**
+   * 계정을 email로 검색한다.
+   *
+   * @param {string} email
+   * @return {*}  {Promise<Account>}
+   * @memberof AccountService
+   */
+  findAccountByEmail(email: string): Promise<Account> {
+    return this.accountRepository.findOneByEmail(email);
+  }
+
     await this.accountRepository.save(account);
     return account.id;
   }
