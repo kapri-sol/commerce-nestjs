@@ -1,7 +1,14 @@
 import { AccountRepository } from 'src/module/account/account.repository';
 import { AccountService } from 'src/module/account/account.service';
 import { CreateAccountDto } from 'src/module/account/dto/create.dto';
-import { mock, instance, when, anyOfClass } from 'ts-mockito';
+import {
+  mock,
+  instance,
+  when,
+  anyOfClass,
+  anyString,
+  anything,
+} from 'ts-mockito';
 import { faker } from '@faker-js/faker';
 import { plainToInstance } from 'class-transformer';
 import { Account } from 'src/entity/account.entity';
@@ -16,8 +23,9 @@ describe('Account Service', () => {
     _password: faker.internet.password(),
   });
 
+  const saveAccount = (account?: Partial<Account>) =>
     plainToInstance(Account, {
-      id: account?.id || BigInt(1),
+      id: account?.id || BigInt(Math.floor(Math.random() * 100)),
       email: account?.email,
       phone: account?.phone,
       passsword: account?.password,
@@ -28,6 +36,13 @@ describe('Account Service', () => {
     when(mockedAccountRepository.save(anyOfClass(Account))).thenResolve(
       saveAccount(),
     );
+    when(mockedAccountRepository.findOneByEmail(anyString())).thenResolve(
+      initialAccount,
+    );
+    when(mockedAccountRepository.findOneById(anything())).thenResolve(
+      initialAccount,
+    );
+
     accountRepository = instance(mockedAccountRepository);
     accountService = new AccountService(accountRepository);
   });
