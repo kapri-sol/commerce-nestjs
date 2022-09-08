@@ -55,7 +55,7 @@ export class AccountService {
   async updateAccount(
     accountId: bigint,
     udpateAccountDto: UpdateAccountDto,
-  ): Promise<void> {
+  ): Promise<Account> {
     const account = await this.accountRepository.findOneById(accountId);
 
     if (!account) {
@@ -64,7 +64,8 @@ export class AccountService {
 
     account.changePhone(udpateAccountDto.phone);
     account.changePassword(udpateAccountDto.password);
-    await this.accountRepository.save(account);
+
+    return this.accountRepository.save(account);
   }
 
   async deleteAccountById(accountId: bigint): Promise<void> {
