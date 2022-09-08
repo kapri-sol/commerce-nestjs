@@ -58,6 +58,12 @@ describe('Account Service', () => {
           password: faker.internet.password(),
         },
       );
+      // when
+      const accountId = await accountService.createAccount(createAccountDto);
+      // then
+      expect(accountId).toStrictEqual(expect.any(BigInt));
+    });
+  });
 
       const account = await accountService.createAccount(createAccountDto);
 
