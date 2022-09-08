@@ -41,7 +41,23 @@ export class AccountService {
     return this.accountRepository.findOneByEmail(email);
   }
 
+  /**
+   * 계정을 수정한다.
+   *
+   * @param {bigint} accountId
+   * @param {UpdateAccountDto} udpateAccountDto
+   * @return {*}  {Promise<void>}
+   * @memberof AccountService
+   */
+  async updateAccount(
+    accountId: bigint,
+    udpateAccountDto: UpdateAccountDto,
+  ): Promise<void> {
+    const account = await this.accountRepository.findOneById(accountId);
+    account.changePhone(udpateAccountDto.phone);
+    account.changePassword(udpateAccountDto.password);
     await this.accountRepository.save(account);
-    return account.id;
+  }
+
   }
 }
