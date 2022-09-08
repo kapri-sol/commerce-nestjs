@@ -92,4 +92,52 @@ describe('Account Service', () => {
       expect(findAccount.password).toStrictEqual(expect.any(String));
     });
   });
+
+  describe('updateAccount', () => {
+    it('계정 정보를 수정한다.', async () => {
+      // given
+      const accountId = initialAccount.id;
+      const updateAccountDto: UpdateAccountDto = {
+        phone: faker.phone.number('+82 10-####-####'),
+        password: faker.internet.password(),
+      };
+
+      when(mockedAccountRepository.save(anyOfClass(Account))).thenResolve(
+        saveAccount({
+          id: accountId,
+          email: initialAccount.email,
+          phone: updateAccountDto.phone,
+          password: updateAccountDto.password,
+        }),
+      );
+
+      // when
+      const updateAccount = await accountService.updateAccount(
+        accountId,
+        updateAccountDto,
+      );
+
+      // then
+      expect(updateAccount.id).toBe(accountId);
+      expect(updateAccount.phone).toBe(updateAccountDto.phone);
+      expect(updateAccount.password).toStrictEqual(expect.any(String));
+    });
+
+    it('존재하지 않는 계정을 삭제하면, NotFoundErorr를 던진다.', async () => {
+      // given
+      const accountId = initialAccount.id;
+      const updateAccountDto: UpdateAccountDto = {
+        phone: faker.phone.number('+82 10-####-####'),
+        password: faker.internet.password(),
+      };
+
+      when(mockedAccountRepository.findOneById(anything())).thenResolve(null);
+
+      // when
+      const updateAccount = () =>
+        accountService.updateAccount(accountId, updateAccountDto);
+      // then
+      expect(updateAccount).rejects.toThrowError(NotFoundErorr);
+    });
+  });
 });
