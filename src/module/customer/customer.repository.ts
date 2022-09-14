@@ -22,6 +22,10 @@ export class CustomerRepository {
       .getOne();
   }
 
+  softRemove(customer: Customer) {
+    return this.customerRepository.softRemove(customer);
+  }
+
   clear() {
     return this.customerRepository.clear();
   }
