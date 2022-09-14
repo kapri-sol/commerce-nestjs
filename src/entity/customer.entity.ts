@@ -44,17 +44,16 @@ export class Customer {
    * Customer 인스턴스를 생성한다.
    *
    * @static
-   * @param {string} name
-   * @param {string} address
-   * @param {Account} account
+   * @param {string} name 이름
+   * @param {string} address 주소
+   * @param {Account} account 계정
    * @return {*}
    * @memberof Customer
    */
-  static of(name: string, address: string, account: Account) {
+  static of(name: string, address: string) {
     const customer = new Customer();
     customer._name = name;
     customer._address = address;
-    customer._account = account;
     return customer;
   }
 
