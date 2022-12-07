@@ -1,16 +1,17 @@
 import { Account } from 'src/entity/account.entity';
 import { getTestDatasource } from 'test/util/database.util';
-import { DataSource } from 'typeorm';
+import { DataSource, EntityManager, QueryBuilder, Repository } from 'typeorm';
 import { faker } from '@faker-js/faker';
 import * as bcrypt from 'bcrypt';
 import { AccountRepository } from 'src/module/account/account.repository';
+import { Customer } from '@src/entity/customer.entity';
 
 describe('Account Repository', () => {
   let datasource: DataSource;
   let accountRepository: AccountRepository;
 
   beforeAll(async () => {
-    datasource = getTestDatasource({ entities: [Account] });
+    datasource = getTestDatasource({ entities: [Account, Customer] });
 
     await datasource.initialize();
 
@@ -20,7 +21,14 @@ describe('Account Repository', () => {
   });
 
   afterEach(async () => {
-    await accountRepository.clear();
+    console.log(datasource.driver['pool']);
+
+    await datasource.transaction(async (entityManager: EntityManager) => {
+      await entityManager.query('SET FOREIGN_KEY_CHECKS = 0');
+      await entityManager.getRepository(Customer).clear();
+      await entityManager.getRepository(Account).clear();
+      await entityManager.query('SET FOREIGN_KEY_CHECKS = 1');
+    });
   });
 
   afterAll(async () => {
