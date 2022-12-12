@@ -29,8 +29,7 @@ import { AccountModule } from './module/account/account.module';
       synchronize: process.env.NODE_ENV !== 'production',
       entities: [join(__dirname, '**', '*.entity{.ts,.js}')],
     }),
+    AccountModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}
