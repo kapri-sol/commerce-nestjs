@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
+import { join } from 'path';
+import { AccountModule } from './module/account/account.module';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import * as Joi from 'joi';
       database: process.env.DATABASE_NAME,
       username: process.env.DATABASE_USERNAME,
       password: process.env.DATABASE_PASSWORD,
+      synchronize: process.env.NODE_ENV !== 'production',
+      entities: [join(__dirname, '**', '*.entity{.ts,.js}')],
     }),
   ],
   controllers: [AppController],
