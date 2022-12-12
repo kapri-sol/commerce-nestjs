@@ -1,5 +1,4 @@
 import { faker } from '@faker-js/faker';
-import { BadRequestException } from '@nestjs/common';
 import { Account } from '@src/entity/account.entity';
 import { NotFoundErorr } from '@src/error/not-found.error';
 import { AccountController } from '@src/module/account/account.controller';
@@ -34,17 +33,6 @@ describe('AccountController', () => {
 
       // then
       expect(id).toStrictEqual(expect.any(BigInt));
-    });
-
-    it('undefined 값이 들어오면 BadRequestException을 던진다.', () => {
-      // given
-      const parseBigintPipe = new ParseBigintPipe();
-
-      // when
-      const transformToBigint = () => parseBigintPipe.transform(undefined);
-
-      // then
-      expect(transformToBigint).toThrowError(BadRequestException);
     });
   });
 
