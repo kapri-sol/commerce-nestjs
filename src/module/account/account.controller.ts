@@ -1,4 +1,8 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Patch,
+  Post,
 import { ParseBigintPipe } from '@src/pipe/parse-bigint.pipe';
 import { AccountService } from './account.service';
 import { CreateAccountDto } from './dto/create.dto';
@@ -49,4 +53,20 @@ export class AccountController {
       id: accountId.toString(),
     };
   }
+
+  /**
+   *
+   *
+   * @param {bigint} accountId
+   * @param {UpdateAccountDto} updateAccountDto
+   * @memberof AccountController
+   */
+  @Patch(':accountId')
+  async updateAccount(
+    @Param('accountId', ParseBigintPipe) accountId: bigint,
+    @Body() updateAccountDto: UpdateAccountDto,
+  ) {
+    await this.accountService.updateAccount(accountId, updateAccountDto);
+  }
+
 }
