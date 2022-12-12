@@ -1,8 +1,12 @@
 import {
   Body,
   Controller,
+  Delete,
+  Get,
+  Param,
   Patch,
   Post,
+} from '@nestjs/common';
 import { ParseBigintPipe } from '@src/pipe/parse-bigint.pipe';
 import { AccountService } from './account.service';
 import { CreateAccountDto } from './dto/create.dto';
@@ -10,6 +14,7 @@ import {
   CreateAccountResponseDto,
   FindAccountResponseDto,
 } from './dto/response.dto';
+import { UpdateAccountDto } from './dto/update.dto';
 
 @Controller('accounts')
 export class AccountController {
@@ -69,4 +74,14 @@ export class AccountController {
     await this.accountService.updateAccount(accountId, updateAccountDto);
   }
 
+  /**
+   *
+   *
+   * @param {bigint} accountId
+   * @memberof AccountController
+   */
+  @Delete(':accountId')
+  async removeAccount(@Param('accountId', ParseBigintPipe) accountId: bigint) {
+    await this.accountService.deleteAccountById(accountId);
+  }
 }
