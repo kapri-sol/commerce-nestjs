@@ -8,7 +8,6 @@ import { CreateAccountDto } from '@src/module/account/dto/create.dto';
 import { FindAccountResponseDto } from '@src/module/account/dto/response.dto';
 import { ParseBigintPipe } from '@src/pipe/parse-bigint.pipe';
 import { plainToInstance } from 'class-transformer';
-import { validateOrReject, ValidationError } from 'class-validator';
 import { anything, instance, mock, when } from 'ts-mockito';
 
 describe('AccountController', () => {
@@ -104,27 +103,6 @@ describe('AccountController', () => {
       const account = await accountController.createAccount(createAccountDto);
 
       expect(account.id).toStrictEqual(expect.any(String));
-    });
-
-    it('계정 정보가 정확하지 않으면 BadRequestException을 던진다.', async () => {
-      // given
-      const createAccountDto = plainToInstance(CreateAccountDto, {
-        email: faker.internet.email(),
-        phone: faker.phone.number('+82 10-####-####'),
-      });
-
-      // when
-      const validateCreateAccountDto = () =>
-        validateOrReject(createAccountDto, {
-          forbidUnknownValues: true,
-          forbidNonWhitelisted: true,
-          whitelist: true,
-        });
-
-      // then
-      await expect(validateCreateAccountDto).rejects.toThrowError(
-        ValidationError,
-      );
     });
   });
 });
