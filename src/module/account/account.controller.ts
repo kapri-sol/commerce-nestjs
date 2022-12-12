@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+import { ApiParam } from '@nestjs/swagger';
 import { ParseBigintPipe } from '@src/pipe/parse-bigint.pipe';
 import { AccountService } from './account.service';
 import { CreateAccountDto } from './dto/create.dto';
@@ -28,6 +29,10 @@ export class AccountController {
    * @memberof AccountController
    */
   @Get(':accountId')
+  @ApiParam({
+    name: 'accountId',
+    type: 'string',
+  })
   async findAccount(
     @Param('accountId', ParseBigintPipe) accountId: bigint,
   ): Promise<FindAccountResponseDto> {
@@ -50,7 +55,8 @@ export class AccountController {
    */
   @Post()
   async createAccount(
-    @Body() createAccountDto: CreateAccountDto,
+    @Body()
+    createAccountDto: CreateAccountDto,
   ): Promise<CreateAccountResponseDto> {
     const accountId = await this.accountService.createAccount(createAccountDto);
 
@@ -67,6 +73,10 @@ export class AccountController {
    * @memberof AccountController
    */
   @Patch(':accountId')
+  @ApiParam({
+    name: 'accountId',
+    type: 'string',
+  })
   async updateAccount(
     @Param('accountId', ParseBigintPipe) accountId: bigint,
     @Body() updateAccountDto: UpdateAccountDto,
@@ -81,6 +91,10 @@ export class AccountController {
    * @memberof AccountController
    */
   @Delete(':accountId')
+  @ApiParam({
+    name: 'accountId',
+    type: 'string',
+  })
   async removeAccount(@Param('accountId', ParseBigintPipe) accountId: bigint) {
     await this.accountService.deleteAccountById(accountId);
   }
