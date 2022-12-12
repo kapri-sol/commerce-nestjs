@@ -1,10 +1,11 @@
-import { PickType } from '@nestjs/swagger';
-import { Account } from '@src/entity/account.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
-export class FindAccountResponseDto extends PickType(Account, [
-  'email',
-  'phone',
-]) {}
+export class FindAccountResponseDto {
+  @ApiProperty()
+  email: string;
+  @ApiProperty()
+  phone: string;
+}
 
 export class CreateAccountResponseDto {
   id: string;
