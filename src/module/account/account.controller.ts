@@ -7,7 +7,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { ApiParam } from '@nestjs/swagger';
+import { ApiParam, ApiTags } from '@nestjs/swagger';
 import { ParseBigintPipe } from '@src/pipe/parse-bigint.pipe';
 import { AccountService } from './account.service';
 import { CreateAccountDto } from './dto/create.dto';
@@ -17,12 +17,13 @@ import {
 } from './dto/response.dto';
 import { UpdateAccountDto } from './dto/update.dto';
 
+@ApiTags('Account')
 @Controller('accounts')
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
 
   /**
-   *
+   * 계정을 id로 검색한다.
    *
    * @param {bigint} accountId
    * @return {*}  {Promise<FindAccountResponseDto>}
@@ -47,7 +48,7 @@ export class AccountController {
   }
 
   /**
-   *
+   * 계정을 생성한다.
    *
    * @param {CreateAccountDto} createAccountDto
    * @return {*}  {Promise<CreateAccountResponseDto>}
@@ -66,7 +67,7 @@ export class AccountController {
   }
 
   /**
-   *
+   * 계정 정보를 수정한다.
    *
    * @param {bigint} accountId
    * @param {UpdateAccountDto} updateAccountDto
@@ -85,7 +86,7 @@ export class AccountController {
   }
 
   /**
-   *
+   * 계정을 삭제한다.
    *
    * @param {bigint} accountId
    * @memberof AccountController
