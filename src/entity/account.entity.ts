@@ -111,7 +111,11 @@ export class Account {
 
   @BeforeInsert()
   @BeforeUpdate()
-  private async hashPassword() {
+  async hashPassword() {
     this._password = await bcrypt.hashSync(this.password, 10);
+  }
+
+  validatePassword(password: string) {
+    return bcrypt.compare(password, this._password);
   }
 }
