@@ -50,10 +50,11 @@ export class Customer {
    * @return {*}
    * @memberof Customer
    */
-  static of(name: string, address: string) {
+  static of(name: string, address: string, account: Account) {
     const customer = new Customer();
     customer._name = name;
     customer._address = address;
+    customer._account = account;
     return customer;
   }
 
