@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 import { join } from 'path';
 import { AccountModule } from './module/account/account.module';
+import { CustomerModule } from './module/customer/customer.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { AccountModule } from './module/account/account.module';
       entities: [join(__dirname, '**', '*.entity{.ts,.js}')],
     }),
     AccountModule,
+    CustomerModule,
   ],
 })
 export class AppModule {}
