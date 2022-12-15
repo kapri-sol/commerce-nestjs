@@ -3,12 +3,13 @@ import {
   Controller,
   Delete,
   Get,
-  Param,
   Patch,
   Post,
+  Session,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiParam, ApiTags } from '@nestjs/swagger';
-import { ParseBigintPipe } from '@src/pipe/parse-bigint.pipe';
+import { SessionAuthGuard } from '@src/guard/session-auth.guard';
 import { AccountService } from './account.service';
 import { CreateAccountDto } from './dto/create.dto';
 import {
@@ -18,7 +19,7 @@ import {
 import { UpdateAccountDto } from './dto/update.dto';
 
 @ApiTags('Account')
-@Controller('accounts')
+@Controller('account')
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
 
@@ -29,16 +30,15 @@ export class AccountController {
    * @return {*}  {Promise<FindAccountResponseDto>}
    * @memberof AccountController
    */
-  @Get(':accountId')
+  @Get()
+  @UseGuards(SessionAuthGuard)
   @ApiParam({
     name: 'accountId',
     type: 'string',
   })
-  async findAccount(
-    @Param('accountId', ParseBigintPipe) accountId: bigint,
-  ): Promise<FindAccountResponseDto> {
+  async findAccount(@Session() session): Promise<FindAccountResponseDto> {
     const { email, phone } = await this.accountService.findAccountById(
-      accountId,
+      BigInt(session.account.id),
     );
 
     return {
@@ -73,16 +73,19 @@ export class AccountController {
    * @param {UpdateAccountDto} updateAccountDto
    * @memberof AccountController
    */
-  @Patch(':accountId')
+  @Patch()
   @ApiParam({
     name: 'accountId',
     type: 'string',
   })
   async updateAccount(
-    @Param('accountId', ParseBigintPipe) accountId: bigint,
+    @Session() session,
     @Body() updateAccountDto: UpdateAccountDto,
   ) {
-    await this.accountService.updateAccount(accountId, updateAccountDto);
+    await this.accountService.updateAccount(
+      BigInt(session.id),
+      updateAccountDto,
+    );
   }
 
   /**
@@ -91,12 +94,12 @@ export class AccountController {
    * @param {bigint} accountId
    * @memberof AccountController
    */
-  @Delete(':accountId')
+  @Delete()
   @ApiParam({
     name: 'accountId',
     type: 'string',
   })
-  async removeAccount(@Param('accountId', ParseBigintPipe) accountId: bigint) {
-    await this.accountService.deleteAccountById(accountId);
+  async removeAccount(@Session() session) {
+    await this.accountService.deleteAccountById(BigInt(session.id));
   }
 }
