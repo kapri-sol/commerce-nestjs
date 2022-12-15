@@ -3,7 +3,9 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 import { join } from 'path';
+import { NODE_ENV } from './common/env.enum';
 import { AccountModule } from './module/account/account.module';
+import { AuthModule } from './module/auth/auth.module';
 import { CustomerModule } from './module/customer/customer.module';
 
 @Module({
@@ -11,7 +13,11 @@ import { CustomerModule } from './module/customer/customer.module';
     ConfigModule.forRoot({
       envFilePath: `.env.${process.env.NODE_ENV}`,
       validationSchema: Joi.object({
-        NODE_ENV: Joi.string().valid('production', 'test', 'development'),
+        NODE_ENV: Joi.string().valid(
+          NODE_ENV.PRODUCTION,
+          NODE_ENV.TEST,
+          NODE_ENV.DEVELOPMENT,
+        ),
         PORT: Joi.string().default('3000'),
         DATABASE_HOST: Joi.string().required(),
         DATABASE_PORT: Joi.string().required(),
@@ -27,12 +33,13 @@ import { CustomerModule } from './module/customer/customer.module';
       database: process.env.DATABASE_NAME,
       username: process.env.DATABASE_USERNAME,
       password: process.env.DATABASE_PASSWORD,
-      synchronize: process.env.NODE_ENV !== 'production',
-      logging: process.env.NODE_ENV !== 'production',
+      synchronize: process.env.NODE_ENV !== NODE_ENV.PRODUCTION,
+      logging: process.env.NODE_ENV !== NODE_ENV.PRODUCTION,
       entities: [join(__dirname, '**', '*.entity{.ts,.js}')],
     }),
     AccountModule,
     CustomerModule,
+    AuthModule,
   ],
 })
 export class AppModule {}
