@@ -1,6 +1,5 @@
 import { faker } from '@faker-js/faker';
 import { Test, TestingModule } from '@nestjs/testing';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccountModule } from '@src/module/account/account.module';
 import { DataSource } from 'typeorm';
 import * as request from 'supertest';
@@ -8,27 +7,33 @@ import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common';
 import { Account } from '@src/entity/account.entity';
 import { Customer } from '@src/entity/customer.entity';
 import { AccountRepository } from '@src/module/account/account.repository';
+import { AppModule } from '@src/app.module';
+import * as session from 'express-session';
+import { sessionConfig } from '@src/config/session.config';
+import { find } from '@fxts/core';
 
 describe('Account e2e', () => {
   let app: INestApplication;
   let databaseSource: DataSource;
   let accountRepository: AccountRepository;
 
+  const createAccount = () => {};
+
+  const login = async (email: string, password: string) => {
+    const cookies: string[] = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({
+        email,
+        password,
+      })
+      .then(({ headers }) => headers['set-cookie']);
+
+    return find((cookie) => cookie.split('=').shift() === 'auth', cookies);
+  };
+
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        TypeOrmModule.forRoot({
-          type: 'mysql',
-          host: 'localhost',
-          port: 3306,
-          database: 'test',
-          username: 'root',
-          password: '1234',
-          synchronize: true,
-          entities: [Account, Customer],
-        }),
-        AccountModule,
-      ],
+      imports: [AppModule, AccountModule],
     }).compile();
 
     app = module.createNestApplication();
@@ -37,7 +42,7 @@ describe('Account e2e', () => {
         transform: true,
       }),
     );
-
+    app.use(session(sessionConfig));
     databaseSource = module.get<DataSource>(DataSource);
     accountRepository = module.get<AccountRepository>(AccountRepository);
 
@@ -57,7 +62,8 @@ describe('Account e2e', () => {
     });
   });
 
-  it('/accounts (GET)', async () => {
+  it('/account (GET)', async () => {
+    // given
     const email = faker.internet.email();
     const password = faker.internet.password();
     const phone = faker.phone.number('+82 10-####-####');
@@ -65,10 +71,15 @@ describe('Account e2e', () => {
     const account = Account.of(email, phone, password);
     await accountRepository.save(account);
 
+    const authCookie = await login(email, password);
+
+    // when
     const response = await request(app.getHttpServer())
-      .get(`/accounts/${account.id.toString()}`)
+      .get(`/account`)
+      .set('Cookie', authCookie)
       .send();
 
+    // then
     expect(response.statusCode).toBe(HttpStatus.OK);
     expect(response.body).toStrictEqual({
       email,
@@ -81,7 +92,7 @@ describe('Account e2e', () => {
     const password = faker.internet.password();
     const phone = faker.phone.number('+82 10-####-####');
 
-    const response = await request(app.getHttpServer()).post('/accounts').send({
+    const response = await request(app.getHttpServer()).post('/account').send({
       email,
       password,
       phone,
@@ -111,8 +122,11 @@ describe('Account e2e', () => {
     const updatePassword = faker.internet.password();
     const updatePhone = faker.phone.number('+82 10-####-####');
 
+    const authCookie = await login(email, password);
+
     const response = await request(app.getHttpServer())
-      .patch(`/accounts/${account.id.toString()}`)
+      .patch('/account')
+      .set('Cookie', authCookie)
       .send({
         phone: updatePhone,
         password: updatePassword,
@@ -132,9 +146,11 @@ describe('Account e2e', () => {
     const account = Account.of(email, phone, password);
     await accountRepository.save(account);
 
-    const response = await request(app.getHttpServer()).delete(
-      `/accounts/${account.id.toString()}`,
-    );
+    const authCookie = await login(email, password);
+
+    const response = await request(app.getHttpServer())
+      .delete('/account')
+      .set('Cookie', authCookie);
 
     const deleteAccount = await accountRepository.findOneById(account.id);
 
