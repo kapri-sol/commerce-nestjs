@@ -32,17 +32,6 @@ describe('', () => {
     databaseSource = module.get<DataSource>(DataSource);
     accountRepository = module.get<AccountRepository>(AccountRepository);
 
-    // app.use(
-    //   session({
-    //     name: 'auth',
-    //     secret: 'my-secret',
-    //     resave: false,
-    //     saveUninitialized: false,
-    //     cookie: {
-    //       httpOnly: true,
-    //     },
-    //   }),
-    // );
     await app.init();
   });
 
@@ -61,6 +50,7 @@ describe('', () => {
 
   describe('/auth/login', () => {
     it('로그인', async () => {
+      // given
       const email = faker.internet.email();
       const password = faker.internet.password();
       const phone = faker.phone.number('+82 10-####-####');
@@ -69,6 +59,7 @@ describe('', () => {
 
       await accountRepository.save(account);
 
+      // when
       const response = await request(app.getHttpServer())
         .post('/auth/login')
         .send({
@@ -76,8 +67,34 @@ describe('', () => {
           password,
         });
 
+      // then
       expect(response.statusCode).toBe(HttpStatus.OK);
-      console.log(response.headers);
+      expect(
+        response.headers['set-cookie'].find((cookie: string) =>
+          cookie.startsWith('auth'),
+        ),
+      ).toBeTruthy();
+    });
+
+    it('잘못된 패스워드를 입력했을 경우', async () => {
+      // given
+      const email = faker.internet.email();
+      const password = faker.internet.password();
+      const phone = faker.phone.number('+82 10-####-####');
+
+      const account = Account.of(email, phone, password);
+
+      await accountRepository.save(account);
+
+      // when
+      const response = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          email,
+          password: `${password}123`,
+        });
+
+      expect(response.statusCode).toBe(HttpStatus.UNAUTHORIZED);
     });
   });
 });
