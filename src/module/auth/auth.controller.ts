@@ -1,4 +1,11 @@
-import { Controller, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { LocalAuthGuard } from '@src/guard/local-auth.guard';
 import { instanceToPlain } from 'class-transformer';
@@ -11,9 +18,9 @@ export class AuthController {
   @ApiBody({
     type: LoginDto,
   })
+  @HttpCode(HttpStatus.OK)
   @Post('login')
   login(@Request() req) {
     req.session.account = instanceToPlain(req.account);
-    console.log(req.session.account);
   }
 }
