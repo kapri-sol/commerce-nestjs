@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { instanceToPlain } from 'class-transformer';
 import { AccountService } from '../account/account.service';
 
 @Injectable()
@@ -15,6 +16,12 @@ export class AuthService {
    */
   async validateAccount(email: string, password: string) {
     const account = await this.accountService.findAccountByEmail(email);
-    return account?.validatePassword(password) ? account : null;
+
+    return account?.validatePassword(password)
+      ? {
+          ...instanceToPlain(account),
+          _id: account.id.toString(),
+        }
+      : null;
   }
 }
