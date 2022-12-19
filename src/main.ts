@@ -1,7 +1,6 @@
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as session from 'express-session';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -24,18 +23,6 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
-
-  app.use(
-    session({
-      name: 'auth',
-      secret: 'my-secret',
-      resave: false,
-      saveUninitialized: false,
-      cookie: {
-        httpOnly: true,
-      },
-    }),
-  );
 
   await app.listen(4000);
 }

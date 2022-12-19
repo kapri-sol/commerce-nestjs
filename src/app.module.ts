@@ -1,9 +1,10 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 import { join } from 'path';
 import { NODE_ENV } from './common/env.enum';
+import { SessionMiddleware } from './middleware/session.middleware';
 import { AccountModule } from './module/account/account.module';
 import { AuthModule } from './module/auth/auth.module';
 import { CustomerModule } from './module/customer/customer.module';
@@ -34,7 +35,7 @@ import { CustomerModule } from './module/customer/customer.module';
       username: process.env.DATABASE_USERNAME,
       password: process.env.DATABASE_PASSWORD,
       synchronize: process.env.NODE_ENV !== NODE_ENV.PRODUCTION,
-      logging: process.env.NODE_ENV !== NODE_ENV.PRODUCTION,
+      logging: process.env.NODE_ENV === NODE_ENV.DEVELOPMENT,
       entities: [join(__dirname, '**', '*.entity{.ts,.js}')],
     }),
     AccountModule,
@@ -42,4 +43,8 @@ import { CustomerModule } from './module/customer/customer.module';
     AuthModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(SessionMiddleware).forRoutes('*');
+  }
+}
