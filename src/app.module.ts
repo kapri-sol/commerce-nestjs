@@ -45,6 +45,6 @@ import { CustomerModule } from './module/customer/customer.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(SessionMiddleware).forRoutes('*');
+    // consumer.apply(SessionMiddleware).forRoutes('*');
   }
 }
