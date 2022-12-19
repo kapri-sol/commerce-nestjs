@@ -7,8 +7,6 @@ export class SessionAuthGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest();
-    console.log(request.session);
-
     return request.session.account ? true : false;
   }
 }
