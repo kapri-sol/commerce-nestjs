@@ -5,18 +5,16 @@ import {
   Get,
   Patch,
   Post,
-  Session,
   UseGuards,
 } from '@nestjs/common';
-import { ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { SessionAuthGuard } from '@src/guard/session-auth.guard';
 import { AccountService } from './account.service';
 import { CreateAccountDto } from './dto/create.dto';
-import {
-  CreateAccountResponseDto,
-  FindAccountResponseDto,
-} from './dto/response.dto';
+import { FindAccountResponse } from './response/find.response';
 import { UpdateAccountDto } from './dto/update.dto';
+import { CreateAccountResponse } from './response/create.response';
+import { SessionAccount } from '@src/decorator/account.decorator';
 
 @ApiTags('Account')
 @Controller('account')
@@ -24,21 +22,17 @@ export class AccountController {
   constructor(private readonly accountService: AccountService) {}
 
   /**
-   * 계정을 id로 검색한다.
+   * 계정 정보를 검색한다.
    *
-   * @param {bigint} accountId
-   * @return {*}  {Promise<FindAccountResponseDto>}
+   * @param {*} session
+   * @return {*}  {Promise<FindAccountResponse>}
    * @memberof AccountController
    */
   @Get()
   @UseGuards(SessionAuthGuard)
-  @ApiParam({
-    name: 'accountId',
-    type: 'string',
-  })
-  async findAccount(@Session() session): Promise<FindAccountResponseDto> {
+  async findAccount(@SessionAccount() account): Promise<FindAccountResponse> {
     const { email, phone } = await this.accountService.findAccountById(
-      BigInt(session.account.id),
+      BigInt(account._id),
     );
 
     return {
@@ -51,14 +45,14 @@ export class AccountController {
    * 계정을 생성한다.
    *
    * @param {CreateAccountDto} createAccountDto
-   * @return {*}  {Promise<CreateAccountResponseDto>}
+   * @return {*}  {Promise<CreateAccountResponse>}
    * @memberof AccountController
    */
   @Post()
   async createAccount(
     @Body()
     createAccountDto: CreateAccountDto,
-  ): Promise<CreateAccountResponseDto> {
+  ): Promise<CreateAccountResponse> {
     const accountId = await this.accountService.createAccount(createAccountDto);
 
     return {
@@ -74,16 +68,12 @@ export class AccountController {
    * @memberof AccountController
    */
   @Patch()
-  @ApiParam({
-    name: 'accountId',
-    type: 'string',
-  })
   async updateAccount(
-    @Session() session,
+    @SessionAccount() account,
     @Body() updateAccountDto: UpdateAccountDto,
   ) {
     await this.accountService.updateAccount(
-      BigInt(session.id),
+      BigInt(account._id),
       updateAccountDto,
     );
   }
@@ -95,11 +85,7 @@ export class AccountController {
    * @memberof AccountController
    */
   @Delete()
-  @ApiParam({
-    name: 'accountId',
-    type: 'string',
-  })
-  async removeAccount(@Session() session) {
-    await this.accountService.deleteAccountById(BigInt(session.id));
+  async removeAccount(@SessionAccount() account) {
+    await this.accountService.deleteAccountById(BigInt(account._id));
   }
 }
