@@ -1,16 +1,9 @@
 import { NestMiddleware } from '@nestjs/common';
+import { sessionConfig } from '@src/config/session.config';
 import * as session from 'express-session';
 
 export class SessionMiddleware implements NestMiddleware {
   use(req: any, res: any, next: (error?: any) => void) {
-    session({
-      name: 'auth',
-      secret: 'my-secret',
-      resave: false,
-      saveUninitialized: false,
-      cookie: {
-        httpOnly: true,
-      },
-    })(req, res, next);
+    session(sessionConfig)(req, res, next);
   }
 }
