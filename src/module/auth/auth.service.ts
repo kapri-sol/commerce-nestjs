@@ -17,7 +17,9 @@ export class AuthService {
   async validateAccount(email: string, password: string) {
     const account = await this.accountService.findAccountByEmail(email);
 
-    return account?.validatePassword(password)
+    const validateResult = await account?.validatePassword(password);
+
+    return validateResult
       ? {
           ...instanceToPlain(account),
           _id: account.id.toString(),
