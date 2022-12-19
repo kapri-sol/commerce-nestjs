@@ -4,7 +4,7 @@ import { NotFoundErorr } from '@src/error/not-found.error';
 import { AccountController } from '@src/module/account/account.controller';
 import { AccountService } from '@src/module/account/account.service';
 import { CreateAccountDto } from '@src/module/account/dto/create.dto';
-import { FindAccountResponseDto } from '@src/module/account/dto/response.dto';
+import { FindAccountResponse } from '@src/module/account/response/find.response';
 import { ParseBigintPipe } from '@src/pipe/parse-bigint.pipe';
 import { plainToInstance } from 'class-transformer';
 import { anything, instance, mock, when } from 'ts-mockito';
@@ -49,8 +49,9 @@ describe('AccountController', () => {
       );
 
       // when
-      const account: FindAccountResponseDto =
-        await accountController.findAccount(BigInt(1));
+      const account: FindAccountResponse = await accountController.findAccount(
+        BigInt(1),
+      );
 
       // then
       expect(account).toStrictEqual({
