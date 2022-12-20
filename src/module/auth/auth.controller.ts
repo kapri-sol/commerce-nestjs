@@ -8,7 +8,6 @@ import {
 } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { LocalAuthGuard } from '@src/guard/local-auth.guard';
-import { instanceToPlain } from 'class-transformer';
 import { LoginDto } from './dto/auth.dto';
 
 @ApiTags('Auth')
@@ -21,6 +20,6 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('login')
   login(@Request() req) {
-    req.session.account = instanceToPlain(req.account);
+    req.session.account = req.account;
   }
 }
