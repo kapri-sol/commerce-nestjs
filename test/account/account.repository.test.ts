@@ -3,7 +3,7 @@ import { getTestDatasource } from 'test/util/database.util';
 import { DataSource, EntityManager, QueryBuilder, Repository } from 'typeorm';
 import { faker } from '@faker-js/faker';
 import * as bcrypt from 'bcrypt';
-import { AccountRepository } from 'src/module/account/account.repository';
+import { AccountRepository } from '@src/module/account/account.query-repository';
 import { Customer } from '@src/entity/customer.entity';
 
 describe('Account Repository', () => {

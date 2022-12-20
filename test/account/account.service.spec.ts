@@ -1,4 +1,4 @@
-import { AccountRepository } from 'src/module/account/account.repository';
+import { AccountRepository } from '@src/module/account/account.query-repository';
 import { AccountService } from 'src/module/account/account.service';
 import { CreateAccountDto } from 'src/module/account/dto/create.dto';
 import {

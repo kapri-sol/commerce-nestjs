@@ -1,12 +1,18 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Account } from 'src/entity/account.entity';
-import { AccountRepository } from './account.repository';
+import { Repository } from 'typeorm';
+import { AccountQueryRepository } from './account.query-repository';
 import { CreateAccountDto } from './dto/create.dto';
 import { UpdateAccountDto } from './dto/update.dto';
 
 @Injectable()
 export class AccountService {
-  constructor(private readonly accountRepository: AccountRepository) {}
+  constructor(
+    @InjectRepository(Account)
+    private readonly accountRepository: Repository<Account>,
+    private readonly accountQueryRepository: AccountQueryRepository,
+  ) {}
 
   /**
    * 계정을 생성한다.
@@ -29,7 +35,7 @@ export class AccountService {
    * @memberof AccountService
    */
   async findAccountById(accountId: bigint): Promise<Account> {
-    const account = await this.accountRepository.findOneById(accountId);
+    const account = await this.accountQueryRepository.findOneById(accountId);
 
     if (!account) {
       throw new NotFoundException();
@@ -46,7 +52,7 @@ export class AccountService {
    * @memberof AccountService
    */
   async findAccountByEmail(email: string): Promise<Account> {
-    const account = await this.accountRepository.findOneByEmail(email);
+    const account = await this.accountQueryRepository.findOneByEmail(email);
 
     if (!account) {
       throw new NotFoundException();
@@ -67,7 +73,7 @@ export class AccountService {
     accountId: bigint,
     updateAccountDto: UpdateAccountDto,
   ): Promise<Account> {
-    const account = await this.accountRepository.findOneById(accountId);
+    const account = await this.accountQueryRepository.findOneById(accountId);
 
     if (!account) {
       throw new NotFoundException();
@@ -92,7 +98,7 @@ export class AccountService {
    * @memberof AccountService
    */
   async deleteAccountById(accountId: bigint): Promise<void> {
-    const account = await this.accountRepository.findOneById(accountId);
+    const account = await this.accountQueryRepository.findOneById(accountId);
 
     if (!account) {
       throw new NotFoundException();

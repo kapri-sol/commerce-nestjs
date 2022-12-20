@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { Account } from '@src/entity/account.entity';
 import { Customer } from '@src/entity/customer.entity';
-import { AccountRepository } from '@src/module/account/account.repository';
+import { AccountRepository } from '@src/module/account/account.query-repository';
 import { CustomerRepository } from '@src/module/customer/customer.repository';
 import { CustomerService } from '@src/module/customer/customer.service';
 import { CreateCustomerDto } from '@src/module/customer/dto/create.dto';

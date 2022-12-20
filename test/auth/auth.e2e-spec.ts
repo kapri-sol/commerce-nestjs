@@ -3,7 +3,7 @@ import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Account } from '@src/entity/account.entity';
 import { Customer } from '@src/entity/customer.entity';
-import { AccountRepository } from '@src/module/account/account.repository';
+import { AccountRepository } from '@src/module/account/account.query-repository';
 import { DataSource } from 'typeorm';
 import * as request from 'supertest';
 import { AppModule } from '@src/app.module';

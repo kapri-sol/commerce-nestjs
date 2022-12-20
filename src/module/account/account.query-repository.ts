@@ -4,15 +4,11 @@ import { Account } from 'src/entity/account.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
-export class AccountRepository {
+export class AccountQueryRepository {
   constructor(
     @InjectRepository(Account)
     private readonly accountRepository: Repository<Account>,
   ) {}
-
-  save(account: Account): Promise<Account> {
-    return this.accountRepository.save(account);
-  }
 
   findOneById(id: bigint): Promise<Account> {
     return this.accountRepository
@@ -28,13 +24,5 @@ export class AccountRepository {
       .where('account.email = :email', { email })
       .where('account.deleted_at is null')
       .getOne();
-  }
-
-  async softRemove(account: Account): Promise<void> {
-    await this.accountRepository.softRemove(account);
-  }
-
-  clear() {
-    return this.accountRepository.clear();
   }
 }

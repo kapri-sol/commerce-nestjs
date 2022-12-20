@@ -1,21 +1,23 @@
 import { faker } from '@faker-js/faker';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AccountModule } from '@src/module/account/account.module';
-import { DataSource } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import * as request from 'supertest';
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common';
 import { Account } from '@src/entity/account.entity';
 import { Customer } from '@src/entity/customer.entity';
-import { AccountRepository } from '@src/module/account/account.repository';
+import { AccountQueryRepository } from '@src/module/account/account.query-repository';
 import { AppModule } from '@src/app.module';
 import * as session from 'express-session';
 import { sessionConfig } from '@src/config/session.config';
 import { find } from '@fxts/core';
+import { getRepositoryToken } from '@nestjs/typeorm';
 
 describe('Account e2e', () => {
   let app: INestApplication;
   let databaseSource: DataSource;
-  let accountRepository: AccountRepository;
+  let accountRepository: Repository<Account>;
+  let accountQueryRepository: AccountQueryRepository;
 
   const login = async (email: string, password: string) => {
     const cookies: string[] = await request(app.getHttpServer())
@@ -42,7 +44,12 @@ describe('Account e2e', () => {
     );
     app.use(session(sessionConfig));
     databaseSource = module.get<DataSource>(DataSource);
-    accountRepository = module.get<AccountRepository>(AccountRepository);
+    accountRepository = module.get<Repository<Account>>(
+      getRepositoryToken(Account),
+    );
+    accountQueryRepository = module.get<AccountQueryRepository>(
+      AccountQueryRepository,
+    );
 
     await app.init();
   });
@@ -109,7 +116,7 @@ describe('Account e2e', () => {
         id: expect.any(String),
       });
 
-      const account = await accountRepository.findOneById(
+      const account = await accountQueryRepository.findOneById(
         BigInt(response.body.id),
       );
 
@@ -213,7 +220,9 @@ describe('Account e2e', () => {
         });
 
       // then
-      const updateAccount = await accountRepository.findOneById(account.id);
+      const updateAccount = await accountQueryRepository.findOneById(
+        account.id,
+      );
       const isValidPassword = await updateAccount.validatePassword(
         updatePassword,
       );
@@ -245,7 +254,9 @@ describe('Account e2e', () => {
         });
 
       // then
-      const updateAccount = await accountRepository.findOneById(account.id);
+      const updateAccount = await accountQueryRepository.findOneById(
+        account.id,
+      );
 
       expect(response.statusCode).toBe(HttpStatus.OK);
       expect(updateAccount.phone).toBe(updatePhone);
@@ -273,7 +284,9 @@ describe('Account e2e', () => {
         });
 
       // then
-      const updateAccount = await accountRepository.findOneById(account.id);
+      const updateAccount = await accountQueryRepository.findOneById(
+        account.id,
+      );
       const isValidPassword = await updateAccount.validatePassword(
         updatePassword,
       );
@@ -298,7 +311,9 @@ describe('Account e2e', () => {
         .patch('/account')
         .set('Cookie', authCookie)
         .send({});
-      const updateAccount = await accountRepository.findOneById(account.id);
+      const updateAccount = await accountQueryRepository.findOneById(
+        account.id,
+      );
       const isValidPassword = await updateAccount.validatePassword(password);
 
       // then
@@ -325,7 +340,9 @@ describe('Account e2e', () => {
         .delete('/account')
         .set('Cookie', authCookie);
 
-      const deleteAccount = await accountRepository.findOneById(account.id);
+      const deleteAccount = await accountQueryRepository.findOneById(
+        account.id,
+      );
 
       // then
       expect(response.statusCode).toBe(HttpStatus.OK);
@@ -350,7 +367,9 @@ describe('Account e2e', () => {
         .delete('/account')
         .set('Cookie', authCookie);
 
-      const deleteAccount = await accountRepository.findOneById(account.id);
+      const deleteAccount = await accountQueryRepository.findOneById(
+        account.id,
+      );
 
       // then
       expect(response.statusCode).toBe(HttpStatus.NOT_FOUND);

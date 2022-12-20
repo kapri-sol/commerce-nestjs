@@ -1,7 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Customer } from '@src/entity/customer.entity';
-import { NotFoundErorr } from '@src/error/not-found.error';
-import { AccountRepository } from '../account/account.repository';
+import { AccountQueryRepository } from '../account/account.query-repository';
 import { CustomerRepository } from './customer.repository';
 import { CreateCustomerDto } from './dto/create.dto';
 import { UpdateCustomerDto } from './dto/update.dto';
@@ -9,7 +8,7 @@ import { UpdateCustomerDto } from './dto/update.dto';
 @Injectable()
 export class CustomerService {
   constructor(
-    private readonly accountRepository: AccountRepository,
+    private readonly accountQueryRepository: AccountQueryRepository,
     private readonly customerRepository: CustomerRepository,
   ) {}
 
@@ -22,7 +21,7 @@ export class CustomerService {
    */
   async createCustomer(createCustomerDto: CreateCustomerDto): Promise<bigint> {
     const { name, address } = createCustomerDto;
-    const account = await this.accountRepository.findOneById(
+    const account = await this.accountQueryRepository.findOneById(
       createCustomerDto.accountId,
     );
 
@@ -58,7 +57,7 @@ export class CustomerService {
     const customer = await this.customerRepository.findOneById(customerId);
 
     if (!customer) {
-      throw new NotFoundErorr();
+      throw new NotFoundException();
     }
 
     const { name, address } = updateCustomerDto;
@@ -79,7 +78,7 @@ export class CustomerService {
     const customer = await this.customerRepository.findOneById(customerId);
 
     if (!customer) {
-      throw new NotFoundErorr();
+      throw new NotFoundException();
     }
 
     await this.customerRepository.softRemove(customer);
