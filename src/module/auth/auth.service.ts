@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { instanceToPlain } from 'class-transformer';
 import { AccountService } from '../account/account.service';
 
 @Injectable()
@@ -21,8 +20,7 @@ export class AuthService {
 
     return validateResult
       ? {
-          ...instanceToPlain(account),
-          _id: account.id.toString(),
+          id: account.id.toString(),
         }
       : null;
   }
