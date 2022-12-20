@@ -14,7 +14,7 @@ import { CreateAccountDto } from './dto/create.dto';
 import { FindAccountResponse } from './response/find.response';
 import { UpdateAccountDto } from './dto/update.dto';
 import { CreateAccountResponse } from './response/create.response';
-import { SessionAccount } from '@src/decorator/account.decorator';
+import { SessionAccountId } from '@src/decorator/account-id.decorator';
 
 @ApiTags('Account')
 @Controller('account')
@@ -30,9 +30,11 @@ export class AccountController {
    */
   @Get()
   @UseGuards(SessionAuthGuard)
-  async findAccount(@SessionAccount() account): Promise<FindAccountResponse> {
+  async findAccount(
+    @SessionAccountId() accountId: bigint,
+  ): Promise<FindAccountResponse> {
     const { email, phone } = await this.accountService.findAccountById(
-      BigInt(account._id),
+      accountId,
     );
 
     return {
@@ -69,13 +71,10 @@ export class AccountController {
    */
   @Patch()
   async updateAccount(
-    @SessionAccount() account,
+    @SessionAccountId() accountId: bigint,
     @Body() updateAccountDto: UpdateAccountDto,
   ) {
-    await this.accountService.updateAccount(
-      BigInt(account._id),
-      updateAccountDto,
-    );
+    await this.accountService.updateAccount(accountId, updateAccountDto);
   }
 
   /**
@@ -85,7 +84,7 @@ export class AccountController {
    * @memberof AccountController
    */
   @Delete()
-  async removeAccount(@SessionAccount() account) {
-    await this.accountService.deleteAccountById(BigInt(account._id));
+  async removeAccount(@SessionAccountId() accountId: bigint) {
+    await this.accountService.deleteAccountById(accountId);
   }
 }
