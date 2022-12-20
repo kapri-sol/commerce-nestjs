@@ -1,10 +1,9 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 import { join } from 'path';
 import { NODE_ENV } from './common/env.enum';
-import { SessionMiddleware } from './middleware/session.middleware';
 import { AccountModule } from './module/account/account.module';
 import { AuthModule } from './module/auth/auth.module';
 import { CustomerModule } from './module/customer/customer.module';
@@ -43,8 +42,4 @@ import { CustomerModule } from './module/customer/customer.module';
     AuthModule,
   ],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    // consumer.apply(SessionMiddleware).forRoutes('*');
-  }
-}
+export class AppModule {}
