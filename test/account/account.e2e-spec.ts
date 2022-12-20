@@ -214,14 +214,16 @@ describe('Account e2e', () => {
 
       // then
       const updateAccount = await accountRepository.findOneById(account.id);
-      const isValid = await updateAccount.validatePassword(updatePassword);
+      const isValidPassword = await updateAccount.validatePassword(
+        updatePassword,
+      );
 
       expect(response.statusCode).toBe(HttpStatus.OK);
       expect(updateAccount.phone).toBe(updatePhone);
-      expect(isValid).toBe(true);
+      expect(isValidPassword).toBe(true);
     });
 
-    it('계정 정보를 수정한다.', async () => {
+    it('휴대폰 번호를 수정한다.', async () => {
       // given
       const email = faker.internet.email();
       const password = faker.internet.password();
@@ -230,7 +232,6 @@ describe('Account e2e', () => {
       const account = Account.of(email, phone, password);
       await accountRepository.save(account);
 
-      const updatePassword = faker.internet.password();
       const updatePhone = faker.phone.number('+82 10-####-####');
 
       const authCookie = await login(email, password);
@@ -241,36 +242,119 @@ describe('Account e2e', () => {
         .set('Cookie', authCookie)
         .send({
           phone: updatePhone,
+        });
+
+      // then
+      const updateAccount = await accountRepository.findOneById(account.id);
+
+      expect(response.statusCode).toBe(HttpStatus.OK);
+      expect(updateAccount.phone).toBe(updatePhone);
+    });
+
+    it('비밀번호를 수정한다.', async () => {
+      // given
+      const email = faker.internet.email();
+      const password = faker.internet.password();
+      const phone = faker.phone.number('+82 10-####-####');
+
+      const account = Account.of(email, phone, password);
+      await accountRepository.save(account);
+
+      const updatePassword = faker.internet.password();
+
+      const authCookie = await login(email, password);
+
+      // when
+      const response = await request(app.getHttpServer())
+        .patch('/account')
+        .set('Cookie', authCookie)
+        .send({
           password: updatePassword,
         });
 
       // then
       const updateAccount = await accountRepository.findOneById(account.id);
-      const isValid = await updateAccount.validatePassword(updatePassword);
+      const isValidPassword = await updateAccount.validatePassword(
+        updatePassword,
+      );
 
       expect(response.statusCode).toBe(HttpStatus.OK);
-      expect(updateAccount.phone).toBe(updatePhone);
-      expect(isValid).toBe(true);
+      expect(isValidPassword).toBe(true);
+    });
+
+    it('빈 값을 보내면 계정 정보가 수정되지 않는다..', async () => {
+      // given
+      const email = faker.internet.email();
+      const password = faker.internet.password();
+      const phone = faker.phone.number('+82 10-####-####');
+
+      const account = Account.of(email, phone, password);
+      await accountRepository.save(account);
+
+      const authCookie = await login(email, password);
+
+      // when
+      const response = await request(app.getHttpServer())
+        .patch('/account')
+        .set('Cookie', authCookie)
+        .send({});
+      const updateAccount = await accountRepository.findOneById(account.id);
+      const isValidPassword = await updateAccount.validatePassword(password);
+
+      // then
+      expect(response.statusCode).toBe(HttpStatus.OK);
+      expect(updateAccount.phone).toBe(account.phone);
+      expect(isValidPassword).toBe(true);
     });
   });
 
-  it('/accounts (DELETE)', async () => {
-    const email = faker.internet.email();
-    const password = faker.internet.password();
-    const phone = faker.phone.number('+82 10-####-####');
+  describe('/accounts (DELETE)', () => {
+    it('계정을 제거한다.', async () => {
+      // given
+      const email = faker.internet.email();
+      const password = faker.internet.password();
+      const phone = faker.phone.number('+82 10-####-####');
 
-    const account = Account.of(email, phone, password);
-    await accountRepository.save(account);
+      const account = Account.of(email, phone, password);
+      await accountRepository.save(account);
 
-    const authCookie = await login(email, password);
+      const authCookie = await login(email, password);
 
-    const response = await request(app.getHttpServer())
-      .delete('/account')
-      .set('Cookie', authCookie);
+      // when
+      const response = await request(app.getHttpServer())
+        .delete('/account')
+        .set('Cookie', authCookie);
 
-    const deleteAccount = await accountRepository.findOneById(account.id);
+      const deleteAccount = await accountRepository.findOneById(account.id);
 
-    expect(response.statusCode).toBe(HttpStatus.OK);
-    expect(deleteAccount).toBeNull();
+      // then
+      expect(response.statusCode).toBe(HttpStatus.OK);
+      expect(deleteAccount).toBeNull();
+    });
+
+    it('존재하지 않는 계정을 제거한다.', async () => {
+      // given
+      const email = faker.internet.email();
+      const password = faker.internet.password();
+      const phone = faker.phone.number('+82 10-####-####');
+
+      const account = Account.of(email, phone, password);
+      await accountRepository.save(account);
+
+      const authCookie = await login(email, password);
+
+      await accountRepository.softRemove(account);
+
+      // when
+      const response = await request(app.getHttpServer())
+        .delete('/account')
+        .set('Cookie', authCookie);
+
+      const deleteAccount = await accountRepository.findOneById(account.id);
+
+      // then
+      expect(response.statusCode).toBe(HttpStatus.NOT_FOUND);
+      expect(deleteAccount).toBeNull();
+    });
   });
 });
