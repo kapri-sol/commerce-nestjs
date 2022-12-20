@@ -54,7 +54,7 @@ export class AccountService {
    */
   async updateAccount(
     accountId: bigint,
-    udpateAccountDto: UpdateAccountDto,
+    updateAccountDto: UpdateAccountDto,
   ): Promise<Account> {
     const account = await this.accountRepository.findOneById(accountId);
 
@@ -62,8 +62,13 @@ export class AccountService {
       throw new NotFoundErorr();
     }
 
-    account.changePhone(udpateAccountDto.phone);
-    account.changePassword(udpateAccountDto.password);
+    if (updateAccountDto.phone) {
+      account.changePhone(updateAccountDto.phone);
+    }
+
+    if (updateAccountDto.password) {
+      account.changePassword(updateAccountDto.password);
+    }
 
     return this.accountRepository.save(account);
   }
