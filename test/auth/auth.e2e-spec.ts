@@ -8,6 +8,8 @@ import { DataSource } from 'typeorm';
 import * as request from 'supertest';
 import { AppModule } from '@src/app.module';
 import { AuthModule } from '@src/module/auth/auth.module';
+import * as session from 'express-session';
+import { sessionConfig } from '@src/config/session.config';
 
 describe('', () => {
   let app: INestApplication;
@@ -31,6 +33,8 @@ describe('', () => {
 
     databaseSource = module.get<DataSource>(DataSource);
     accountRepository = module.get<AccountRepository>(AccountRepository);
+
+    app.use(session(sessionConfig));
 
     await app.init();
   });
