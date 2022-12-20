@@ -1,6 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Account } from 'src/entity/account.entity';
-import { NotFoundErorr } from 'src/error/not-found.error';
 import { AccountRepository } from './account.repository';
 import { CreateAccountDto } from './dto/create.dto';
 import { UpdateAccountDto } from './dto/update.dto';
@@ -29,8 +28,14 @@ export class AccountService {
    * @return {*}  {Promise<Account>}
    * @memberof AccountService
    */
-  findAccountById(accountId: bigint): Promise<Account> {
-    return this.accountRepository.findOneById(accountId);
+  async findAccountById(accountId: bigint): Promise<Account> {
+    const account = await this.accountRepository.findOneById(accountId);
+
+    if (!account) {
+      throw new NotFoundException();
+    }
+
+    return account;
   }
 
   /**
@@ -40,15 +45,21 @@ export class AccountService {
    * @return {*}  {Promise<Account>}
    * @memberof AccountService
    */
-  findAccountByEmail(email: string): Promise<Account> {
-    return this.accountRepository.findOneByEmail(email);
+  async findAccountByEmail(email: string): Promise<Account> {
+    const account = await this.accountRepository.findOneByEmail(email);
+
+    if (!account) {
+      throw new NotFoundException();
+    }
+
+    return account;
   }
 
   /**
    * 계정을 수정한다.
    *
    * @param {bigint} accountId
-   * @param {UpdateAccountDto} udpateAccountDto
+   * @param {UpdateAccountDto} updateAccountDto
    * @return {*}  {Promise<void>}
    * @memberof AccountService
    */
@@ -59,7 +70,7 @@ export class AccountService {
     const account = await this.accountRepository.findOneById(accountId);
 
     if (!account) {
-      throw new NotFoundErorr();
+      throw new NotFoundException();
     }
 
     if (updateAccountDto.phone) {
@@ -84,7 +95,7 @@ export class AccountService {
     const account = await this.accountRepository.findOneById(accountId);
 
     if (!account) {
-      throw new NotFoundErorr();
+      throw new NotFoundException();
     }
 
     await this.accountRepository.softRemove(account);
