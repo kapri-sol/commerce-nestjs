@@ -1,5 +1,5 @@
-import { AccountService } from 'src/module/account/account.service';
-import { CreateAccountDto } from 'src/module/account/dto/create.dto';
+import { AccountService } from '@src/modules/account/account.service';
+import { CreateAccountDto } from '@src/modules/account/dto/create.dto';
 import {
   mock,
   instance,
@@ -10,9 +10,9 @@ import {
 } from 'ts-mockito';
 import { faker } from '@faker-js/faker';
 import { plainToInstance } from 'class-transformer';
-import { Account } from 'src/entity/account.entity';
-import { UpdateAccountDto } from 'src/module/account/dto/update.dto';
-import { AccountQueryRepository } from '@src/module/account/account.query-repository';
+import { Account } from '@src/entities/account.entity';
+import { UpdateAccountDto } from '@src/modules/account/dto/update.dto';
+import { AccountQueryRepository } from '@src/modules/account/account.query-repository';
 import { Repository } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
 

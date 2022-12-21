@@ -1,6 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { ParseBigintPipe } from '@src/pipe/parse-bigint.pipe';
+import { ParseBigintPipe } from '@src/utils/pipe/parse-bigint.pipe';
 import { CustomerService } from './customer.service';
 import { FindCustomerResponseDto } from './dto/response.dto';
 

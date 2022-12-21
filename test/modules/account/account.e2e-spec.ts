@@ -1,12 +1,12 @@
 import { faker } from '@faker-js/faker';
 import { Test, TestingModule } from '@nestjs/testing';
-import { AccountModule } from '@src/module/account/account.module';
+import { AccountModule } from '@src/modules/account/account.module';
 import { DataSource, Repository } from 'typeorm';
 import * as request from 'supertest';
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common';
-import { Account } from '@src/entity/account.entity';
-import { Customer } from '@src/entity/customer.entity';
-import { AccountQueryRepository } from '@src/module/account/account.query-repository';
+import { Account } from '@src/entities/account.entity';
+import { Customer } from '@src/entities/customer.entity';
+import { AccountQueryRepository } from '@src/modules/account/account.query-repository';
 import { AppModule } from '@src/app.module';
 import * as session from 'express-session';
 import { sessionConfig } from '@src/config/session.config';

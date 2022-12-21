@@ -1,10 +1,10 @@
 import { faker } from '@faker-js/faker';
-import { Account } from '@src/entity/account.entity';
-import { Customer } from '@src/entity/customer.entity';
-import { AccountRepository } from '@src/module/account/account.query-repository';
-import { CustomerRepository } from '@src/module/customer/customer.repository';
-import { CustomerService } from '@src/module/customer/customer.service';
-import { CreateCustomerDto } from '@src/module/customer/dto/create.dto';
+import { Account } from '@src/entities/account.entity';
+import { Customer } from '@src/entities/customer.entity';
+import { AccountRepository } from '@src/modules/account/account.query-repository';
+import { CustomerRepository } from '@src/modules/customer/customer.repository';
+import { CustomerService } from '@src/modules/customer/customer.service';
+import { CreateCustomerDto } from '@src/modules/customer/dto/create.dto';
 import { plainToInstance } from 'class-transformer';
 import { anyOfClass, anything, instance, mock, when } from 'ts-mockito';
 

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Account } from '@src/entity/account.entity';
+import { Account } from '@src/entities/account.entity';
 import { AccountController } from './account.controller';
 import { AccountQueryRepository } from './account.query-repository';
 import { AccountService } from './account.service';

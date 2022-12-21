@@ -1,4 +1,4 @@
-import { PrimaryGenerateBigintColumn } from '@src/decorator/primary-generate-bigint-column.decorator';
+import { PrimaryGenerateBigintColumn } from '@src/utils/decorator/primary-generate-bigint-column.decorator';
 import {
   Column,
   CreateDateColumn,

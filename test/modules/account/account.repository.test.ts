@@ -1,21 +1,23 @@
-import { Account } from 'src/entity/account.entity';
-import { getTestDatasource } from 'test/util/database.util';
-import { DataSource, EntityManager, QueryBuilder, Repository } from 'typeorm';
+import { Account } from '@src/entities/account.entity';
+import { getTestDatasource } from 'test/utils/database.util';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { faker } from '@faker-js/faker';
 import * as bcrypt from 'bcrypt';
-import { AccountRepository } from '@src/module/account/account.query-repository';
-import { Customer } from '@src/entity/customer.entity';
+import { Customer } from '@src/entities/customer.entity';
+import { AccountQueryRepository } from '@src/modules/account/account.query-repository';
 
 describe('Account Repository', () => {
   let datasource: DataSource;
-  let accountRepository: AccountRepository;
+  let accountRepository: Repository<Account>;
+  let accountQueryRepository: AccountQueryRepository;
 
   beforeAll(async () => {
     datasource = getTestDatasource({ entities: [Account, Customer] });
 
     await datasource.initialize();
 
-    accountRepository = new AccountRepository(
+    accountRepository = datasource.getRepository(Account);
+    accountQueryRepository = new AccountQueryRepository(
       datasource.getRepository(Account),
     );
   });
@@ -120,7 +122,7 @@ describe('Account Repository', () => {
       await accountRepository.save(account);
 
       // when
-      const findAccount = await accountRepository.findOneById(account.id);
+      const findAccount = await accountQueryRepository.findOneById(account.id);
 
       // then
       expect(findAccount).toMatchObject(account);
@@ -135,7 +137,9 @@ describe('Account Repository', () => {
       await accountRepository.save(account);
 
       // when
-      const findAccount = await accountRepository.findOneByEmail(account.email);
+      const findAccount = await accountQueryRepository.findOneByEmail(
+        account.email,
+      );
 
       // then
       expect(findAccount).toMatchObject(account);
@@ -154,7 +158,7 @@ describe('Account Repository', () => {
       // when
       await accountRepository.softRemove(account);
 
-      const findAccount = await accountRepository.findOneById(account.id);
+      const findAccount = await accountQueryRepository.findOneById(account.id);
 
       // then
       expect(findAccount).toBeNull();

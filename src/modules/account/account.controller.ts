@@ -8,13 +8,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { SessionAuthGuard } from '@src/guard/session-auth.guard';
+import { SessionAuthGuard } from '@src/utils/guard/session-auth.guard';
 import { AccountService } from './account.service';
 import { CreateAccountDto } from './dto/create.dto';
 import { FindAccountResponse } from './response/find.response';
 import { UpdateAccountDto } from './dto/update.dto';
 import { CreateAccountResponse } from './response/create.response';
-import { SessionAccountId } from '@src/decorator/account-id.decorator';
+import { SessionAccountId } from '@src/utils/decorator/account-id.decorator';
 
 @ApiTags('Account')
 @Controller('account')

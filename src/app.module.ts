@@ -3,10 +3,10 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 import { join } from 'path';
-import { NODE_ENV } from './common/env.enum';
-import { AccountModule } from './module/account/account.module';
-import { AuthModule } from './module/auth/auth.module';
-import { CustomerModule } from './module/customer/customer.module';
+import { NODE_ENV } from './utils/common/env.enum';
+import { AccountModule } from './modules/account/account.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { CustomerModule } from './modules/customer/customer.module';
 
 @Module({
   imports: [

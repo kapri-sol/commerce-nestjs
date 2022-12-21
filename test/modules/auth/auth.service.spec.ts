@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
-import { Account } from '@src/entity/account.entity';
-import { AccountService } from '@src/module/account/account.service';
-import { AuthService } from '@src/module/auth/auth.service';
+import { Account } from '@src/entities/account.entity';
+import { AccountService } from '@src/modules/account/account.service';
+import { AuthService } from '@src/modules/auth/auth.service';
 import { anyString, instance, mock, when } from 'ts-mockito';
 
 describe('Auth Service', () => {

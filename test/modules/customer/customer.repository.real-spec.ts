@@ -1,8 +1,8 @@
 import { faker } from '@faker-js/faker';
-import { Account } from 'src/entity/account.entity';
-import { Customer } from 'src/entity/customer.entity';
-import { CustomerRepository } from 'src/module/customer/customer.repository';
-import { getTestDatasource } from 'test/util/database.util';
+import { Account } from '@src/entities/account.entity';
+import { Customer } from '@src/entities/customer.entity';
+import { CustomerRepository } from '@src/modules/customer/customer.repository';
+import { getTestDatasource } from 'test/utils/database.util';
 import { DataSource } from 'typeorm';
 
 describe('Customer Repository', () => {

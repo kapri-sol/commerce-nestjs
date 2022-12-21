@@ -1,5 +1,5 @@
 import { IsEmail, IsPhoneNumber, IsString } from 'class-validator';
-import { Account } from 'src/entity/account.entity';
+import { Account } from '@src/entities/account.entity';
 
 export class CreateAccountDto {
   @IsString()
