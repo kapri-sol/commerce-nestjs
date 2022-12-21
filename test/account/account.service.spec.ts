@@ -1,4 +1,3 @@
-import { AccountRepository } from '@src/module/account/account.query-repository';
 import { AccountService } from 'src/module/account/account.service';
 import { CreateAccountDto } from 'src/module/account/dto/create.dto';
 import {
@@ -13,11 +12,15 @@ import { faker } from '@faker-js/faker';
 import { plainToInstance } from 'class-transformer';
 import { Account } from 'src/entity/account.entity';
 import { UpdateAccountDto } from 'src/module/account/dto/update.dto';
-import { NotFoundErorr } from 'src/error/not-found.error';
+import { AccountQueryRepository } from '@src/module/account/account.query-repository';
+import { Repository } from 'typeorm';
+import { NotFoundException } from '@nestjs/common';
 
 describe('Account Service', () => {
-  let mockedAccountRepository: AccountRepository;
-  let accountRepository: AccountRepository;
+  let mockedAccountRepository: Repository<Account>;
+  let accountRepository: Repository<Account>;
+  let mockedAccountQueryRepository: AccountQueryRepository;
+  let accountQueryRepository: AccountQueryRepository;
   let accountService: AccountService;
 
   const initialAccount = plainToInstance(Account, {
@@ -37,24 +40,23 @@ describe('Account Service', () => {
   };
 
   beforeAll(() => {
-    mockedAccountRepository = mock(AccountRepository);
+    mockedAccountRepository = mock(Repository<Account>);
+    mockedAccountQueryRepository = mock(AccountQueryRepository);
   });
 
   beforeEach(() => {
     when(mockedAccountRepository.save(anyOfClass(Account))).thenResolve(
       saveAccount(),
     );
-    when(mockedAccountRepository.findOneByEmail(anyString())).thenResolve(
-      initialAccount,
-    );
-    when(mockedAccountRepository.findOneById(anything())).thenResolve(
-      initialAccount,
-    );
 
     when(mockedAccountRepository.softRemove(anything())).thenResolve(undefined);
 
     accountRepository = instance(mockedAccountRepository);
-    accountService = new AccountService(accountRepository);
+    accountQueryRepository = instance(mockedAccountQueryRepository);
+    accountService = new AccountService(
+      accountRepository,
+      accountQueryRepository,
+    );
   });
 
   describe('createAccount', () => {
@@ -68,6 +70,7 @@ describe('Account Service', () => {
           password: faker.internet.password(),
         },
       );
+
       // when
       const accountId = await accountService.createAccount(createAccountDto);
       // then
@@ -80,6 +83,9 @@ describe('Account Service', () => {
       // given
       const accountId = initialAccount.id;
 
+      when(mockedAccountQueryRepository.findOneById(anything())).thenResolve(
+        initialAccount,
+      );
       // when
       const findAccount = await accountService.findAccountById(accountId);
 
@@ -93,6 +99,11 @@ describe('Account Service', () => {
     it('email로 계정을 검색한다.', async () => {
       // given
       const email = initialAccount.email;
+
+      when(
+        mockedAccountQueryRepository.findOneByEmail(anyString()),
+      ).thenResolve(initialAccount);
+
       // when
       const findAccount = await accountService.findAccountByEmail(email);
       // then
@@ -133,7 +144,7 @@ describe('Account Service', () => {
       expect(updateAccount.password).toStrictEqual(expect.any(String));
     });
 
-    it('존재하지 않는 계정을 삭제하면, NotFoundErorr를 던진다.', async () => {
+    it('존재하지 않는 계정을 수정하려고 하면, NotFoundException을 던진다.', async () => {
       // given
       const accountId = initialAccount.id;
       const updateAccountDto: UpdateAccountDto = {
@@ -141,13 +152,15 @@ describe('Account Service', () => {
         password: faker.internet.password(),
       };
 
-      when(mockedAccountRepository.findOneById(anything())).thenResolve(null);
+      when(mockedAccountQueryRepository.findOneById(anything())).thenResolve(
+        null,
+      );
 
       // when
       const updateAccount = () =>
         accountService.updateAccount(accountId, updateAccountDto);
       // then
-      expect(updateAccount).rejects.toThrowError(NotFoundErorr);
+      expect(updateAccount).rejects.toThrowError(NotFoundException);
     });
   });
 
@@ -161,16 +174,18 @@ describe('Account Service', () => {
       expect(deleteAccount).not.toThrow();
     });
 
-    it('존재하지 않는 계정을 삭제하면, NotFoundError를 던진다.', async () => {
+    it('존재하지 않는 계정을 삭제하려고 하면, NotFoundException을 던진다.', async () => {
       // given
       const accountId = initialAccount.id;
-      when(mockedAccountRepository.findOneById(anything())).thenResolve(null);
+      when(mockedAccountQueryRepository.findOneById(anything())).thenResolve(
+        null,
+      );
 
       // when
       const deleteAccount = () => accountService.deleteAccountById(accountId);
 
       // then
-      expect(deleteAccount).rejects.toThrowError(NotFoundErorr);
+      expect(deleteAccount).rejects.toThrowError(NotFoundException);
     });
   });
 });
