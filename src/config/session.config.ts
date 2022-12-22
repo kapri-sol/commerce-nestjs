@@ -1,4 +1,5 @@
 import * as session from 'express-session';
+
 export const sessionConfig: session.SessionOptions = {
   name: 'auth',
   secret: 'my-secret',
