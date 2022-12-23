@@ -39,8 +39,14 @@ export class CustomerService {
    * @return {*}  {Promise<Customer>}
    * @memberof CustomerService
    */
-  findCustomerById(customerId: bigint): Promise<Customer> {
-    return this.customerRepository.findOneById(customerId);
+  async findCustomerById(customerId: bigint): Promise<Customer> {
+    const customer = await this.customerRepository.findOneById(customerId);
+
+    if (!customer) {
+      throw new NotFoundException();
+    }
+
+    return customer;
   }
 
   /**
