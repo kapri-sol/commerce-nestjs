@@ -3,8 +3,7 @@ import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Account } from '@src/entities/account.entity';
 import { Customer } from '@src/entities/customer.entity';
-import { AccountRepository } from '@src/modules/account/account.query-repository';
-import { DataSource } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import * as request from 'supertest';
 import { AppModule } from '@src/app.module';
 import { AuthModule } from '@src/modules/auth/auth.module';
@@ -14,7 +13,7 @@ import { sessionConfig } from '@src/config/session.config';
 describe('', () => {
   let app: INestApplication;
   let databaseSource: DataSource;
-  let accountRepository: AccountRepository;
+  let accountRepository: Repository<Account>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -32,7 +31,7 @@ describe('', () => {
     );
 
     databaseSource = module.get<DataSource>(DataSource);
-    accountRepository = module.get<AccountRepository>(AccountRepository);
+    accountRepository = module.get<Repository<Account>>(Repository<Account>);
 
     app.use(session(sessionConfig));
 
