@@ -5,10 +5,12 @@ import {
   DeleteDateColumn,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   UpdateDateColumn,
 } from 'typeorm';
 import { Account } from './account.entity';
+import { Product } from './product.entity';
 
 @Entity()
 export class Customer {
@@ -18,6 +20,9 @@ export class Customer {
   @OneToOne(() => Account, (account: Account) => account.customer)
   @JoinColumn()
   private _account: Account;
+
+  @OneToMany(() => Product, (product) => product.owner)
+  private _products: Product[];
 
   @Column()
   private _name: string;
@@ -68,6 +73,10 @@ export class Customer {
 
   set account(account: Account) {
     this._account = account;
+  }
+
+  get products(): Product[] {
+    return this._products;
   }
 
   get name() {
