@@ -12,17 +12,17 @@ export class AccountQueryRepository {
 
   findOneById(id: bigint): Promise<Account> {
     return this.accountRepository
-      .createQueryBuilder('account')
-      .where('account.account_id = :id', { id: id.toString() })
-      .where('account.deleted_at is null')
+      .createQueryBuilder()
+      .where('id = :id', { id: id.toString() })
+      .where('deleted_at is null')
       .getOne();
   }
 
   findOneByEmail(email: string): Promise<Account> {
     return this.accountRepository
-      .createQueryBuilder('account')
-      .where('account.email = :email', { email })
-      .where('account.deleted_at is null')
+      .createQueryBuilder()
+      .where('email = :email', { email })
+      .where('deleted_at is null')
       .getOne();
   }
 }
