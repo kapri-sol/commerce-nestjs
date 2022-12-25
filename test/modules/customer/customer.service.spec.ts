@@ -1,94 +1,95 @@
 import { faker } from '@faker-js/faker';
-import { NotFoundException } from '@nestjs/common';
+import { INestApplication, NotFoundException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { Account } from '@src/entities/account.entity';
 import { Customer } from '@src/entities/customer.entity';
+import { Order } from '@src/entities/order.entity';
+import { Product } from '@src/entities/product.entity';
+import { Seller } from '@src/entities/seller.entity';
 import { AccountQueryRepository } from '@src/modules/account/account.query-repository';
-import { CustomerRepository } from '@src/modules/customer/customer.repository';
+import { CustomerQueryRepository } from '@src/modules/customer/customer.query-repository';
 import { CustomerService } from '@src/modules/customer/customer.service';
-import { CreateCustomerDto } from '@src/modules/customer/dto/create.dto';
+import { CreateCustomerDto } from '@src/modules/customer/dto/create-customer.dto';
+import { UpdateCustomerDto } from '@src/modules/customer/dto/update.dto';
 import { plainToInstance } from 'class-transformer';
-import { anyOfClass, anything, instance, mock, when } from 'ts-mockito';
-import { Repository } from 'typeorm';
+import { IBackup } from 'pg-mem';
+import { getMemDateSource } from 'test/utils/pg-mem.util';
+import { DataSource, Repository } from 'typeorm';
 
 describe('Customer Service', () => {
-  let mockedAccountRepository: Repository<Account>;
+  let datasource: DataSource;
+  let backup: IBackup;
+  let app: INestApplication;
   let accountRepository: Repository<Account>;
-  let mockedAccountQueryRepository: AccountQueryRepository;
-  let accountQueryRepository: AccountQueryRepository;
-  let mockedCustomerRepository: CustomerRepository;
-  let customerRepository: CustomerRepository;
+  let customerQueryRepository: CustomerQueryRepository;
+  let customerRepository: Repository<Customer>;
   let customerService: CustomerService;
 
   const initializeAccount = () => {
-    return Account.of(
+    const account = Account.of(
       faker.internet.email(),
       faker.phone.number('+82 10-####-####'),
       faker.internet.password(),
     );
+
+    return accountRepository.save(account);
   };
 
-  const initializeCustomer = () => {
-    return Customer.of(
+  const initializeCustomer = async () => {
+    const account = await initializeAccount();
+
+    const customer = Customer.of(
       faker.name.fullName(),
       faker.address.streetAddress(),
-      initializeAccount(),
+      account,
     );
-  };
-  const saveAccount = (account?: Partial<Account>) => {
-    return plainToInstance(Account, {
-      _id: account?.id || BigInt(Math.floor(Math.random() * 100)),
-      _email: account?.email,
-      _phone: account?.phone,
-      _password: account?.password,
-    });
+
+    return customerRepository.save(customer);
   };
 
-  const saveCustomer = (customer?: Partial<Customer>) => {
-    return plainToInstance(Customer, {
-      _id: customer?.id || BigInt(Math.floor(Math.random() * 100)),
-      _name: customer?.name,
-      _address: customer?.address,
-    });
-  };
+  beforeAll(async () => {
+    await getMemDateSource([Account, Customer, Product, Seller, Order]).then(
+      (data) => {
+        datasource = data.datasource;
+        backup = data.backup;
+      },
+    );
 
-  beforeAll(() => {
-    mockedAccountRepository = mock(Repository<Account>);
-    mockedAccountQueryRepository = mock(AccountQueryRepository);
-    mockedCustomerRepository = mock(CustomerRepository);
+    const module: TestingModule = await Test.createTestingModule({
+      imports: [
+        TypeOrmModule.forRoot(),
+        TypeOrmModule.forFeature([Account, Customer]),
+      ],
+      providers: [
+        AccountQueryRepository,
+        CustomerQueryRepository,
+        CustomerService,
+      ],
+    })
+      .overrideProvider(DataSource)
+      .useValue(datasource)
+      .compile();
+
+    app = module.createNestApplication();
+
+    accountRepository = datasource.getRepository(Account);
+    customerRepository = datasource.getRepository(Customer);
+    customerQueryRepository = module.get<CustomerQueryRepository>(
+      CustomerQueryRepository,
+    );
+    customerService = module.get<CustomerService>(CustomerService);
   });
 
-  beforeEach(() => {
-    when(mockedAccountRepository.save(anyOfClass(Account))).thenResolve(
-      saveAccount(),
-    );
-    when(mockedCustomerRepository.save(anyOfClass(Customer))).thenResolve(
-      saveCustomer(),
-    );
-
-    accountRepository = instance(mockedAccountRepository);
-    accountQueryRepository = instance(mockedAccountQueryRepository);
-    customerRepository = instance(mockedCustomerRepository);
-    customerService = new CustomerService(
-      accountQueryRepository,
-      customerRepository,
-    );
+  afterEach(async () => {
+    await backup.restore();
   });
 
   describe('createCustomer', () => {
     it('고객을 생성한다.', async () => {
       // given
-      const account = Account.of(
-        faker.internet.email(),
-        faker.phone.number('+82 10-####-####'),
-        faker.internet.password(),
-      );
-      const createAccount = await accountRepository.save(account);
+      const account = await initializeAccount();
 
-      when(mockedAccountQueryRepository.findOneById(anything())).thenResolve(
-        createAccount,
-      );
-
-      // when
       const createCustomerDto: CreateCustomerDto = plainToInstance(
         CreateCustomerDto,
         {
@@ -98,10 +99,12 @@ describe('Customer Service', () => {
         },
       );
 
+      // when
       const customerId = await customerService.createCustomer(
         createCustomerDto,
       );
 
+      // then
       expect(customerId).toStrictEqual(expect.any(BigInt));
     });
   });
@@ -109,29 +112,20 @@ describe('Customer Service', () => {
   describe('findCustomerById', () => {
     it('고객을 id로 검색한다.', async () => {
       // given
-      const customer = initializeCustomer();
-      const createCustomer = await customerRepository.save(customer);
-
-      when(mockedCustomerRepository.findOneById(createCustomer.id)).thenResolve(
-        createCustomer,
-      );
+      const customer = await initializeCustomer();
 
       // when
-      const findCustomer = await customerService.findCustomerById(
-        createCustomer.id,
-      );
+      const findCustomer = await customerService.findCustomerById(customer.id);
 
       // then
-      expect(findCustomer.id).toBe(createCustomer.id);
-      expect(findCustomer.name).toBe(createCustomer.name);
-      expect(findCustomer.address).toBe(createCustomer.address);
+      expect(findCustomer.id).toBe(customer.id);
+      expect(findCustomer.name).toBe(customer.name);
+      expect(findCustomer.address).toBe(customer.address);
     });
 
     it('id로 검색된 고객이 없다면 NotFoundException을 반환한다.', async () => {
       // given
-      const customerId = BigInt(1);
-
-      when(mockedCustomerRepository.findOneById(customerId)).thenResolve(null);
+      const customerId = BigInt(faker.random.numeric());
 
       // when
       const findCustomer = () => customerService.findCustomerById(customerId);
@@ -142,24 +136,70 @@ describe('Customer Service', () => {
   });
 
   describe('updateCustomer', () => {
-    it('고객을 id로 검색한다.', async () => {
+    it('고객 정보를 수정한다.', async () => {
       // given
-      const customer = initializeCustomer();
-      const createCustomer = await customerRepository.save(customer);
+      const customer = await initializeCustomer();
 
-      when(mockedCustomerRepository.findOneById(createCustomer.id)).thenResolve(
-        createCustomer,
-      );
+      const updateCustomerDto: UpdateCustomerDto = {
+        name: faker.name.fullName(),
+        address: faker.address.streetAddress(),
+      };
 
       // when
-      const findCustomer = await customerService.findCustomerById(
-        createCustomer.id,
+      await customerService.updateCustomer(customer.id, updateCustomerDto);
+
+      const updateCustomer = await customerQueryRepository.findOneById(
+        customer.id,
       );
 
       // then
-      expect(findCustomer.id).toBe(createCustomer.id);
-      expect(findCustomer.name).toBe(createCustomer.name);
-      expect(findCustomer.address).toBe(createCustomer.address);
+      expect(updateCustomer.id).toBe(customer.id);
+      expect(updateCustomer.name).toBe(updateCustomerDto.name);
+      expect(updateCustomer.address).toBe(updateCustomerDto.address);
+    });
+
+    it('정보를 수정할 고객이 없으면 NotFoundException을 던진다.', async () => {
+      // given
+      const customerId = BigInt(faker.random.numeric());
+      const updateCustomerDto: UpdateCustomerDto = {
+        name: faker.name.fullName(),
+        address: faker.address.streetAddress(),
+      };
+
+      // when
+      const updateCustomer = () =>
+        customerService.updateCustomer(customerId, updateCustomerDto);
+
+      // then
+      expect(updateCustomer).rejects.toThrowError(NotFoundException);
+    });
+  });
+
+  describe('removeCustomer', () => {
+    it('고객 정보를 삭제한다.', async () => {
+      // given
+      const customer = await initializeCustomer();
+
+      // when
+      await customerService.removeCustomer(customer.id);
+
+      const deleteCustomer = await customerQueryRepository.findOneById(
+        customer.id,
+      );
+
+      // then
+      expect(deleteCustomer).toBeNull();
+    });
+
+    it('없는 고객 정보를 삭제할려고 하면 NotFoundException을 던진다.', async () => {
+      // given
+      const customerId = BigInt(faker.random.numeric());
+
+      // when
+      const removeCustomer = () => customerService.removeCustomer(customerId);
+
+      // then
+      expect(removeCustomer).rejects.toThrowError(NotFoundException);
     });
   });
 });
