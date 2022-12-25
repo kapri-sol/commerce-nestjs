@@ -10,22 +10,25 @@ export class ProductQueryRepository {
     private readonly productRepository: Repository<Product>,
   ) {}
 
-  findProductById(id: bigint): Promise<Product> {
+  findOneById(id: bigint): Promise<Product> {
     return this.productRepository
       .createQueryBuilder()
-      .where('product.product_id = :id', {
+      .where('id = :id', {
         id: id.toString(),
       })
-      .where('product.deleted_at is null')
+      .where('deleted_at is null')
       .getOne();
   }
 
-  findProductsByName(name: string): Promise<Product[]> {
+  findByNameOrDescription(content: string): Promise<Product[]> {
     return this.productRepository
       .createQueryBuilder()
       .select()
-      .where('product.name like %:name%', { name })
-      .where('product.deleted_at is null')
+      .where('deleted_at is null')
+      .where('name like :name', { name: `%${content}%` })
+      .orWhere('description like :description', {
+        description: `%${content}%`,
+      })
       .getMany();
   }
 }
