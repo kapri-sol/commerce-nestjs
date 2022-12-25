@@ -7,8 +7,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from '@src/entities/product.entity';
 import { Repository } from 'typeorm';
 import { SellerQueryRepository } from '../seller/seller.query-repository';
-import { CreateProductDto } from './dto/create.dto';
-import { UpdateProductDto } from './dto/update.dto';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductQueryRepository } from './product.query-repository';
 
 @Injectable()

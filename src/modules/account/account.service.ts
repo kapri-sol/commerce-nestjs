@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Account } from '@src/entities/account.entity';
 import { Repository } from 'typeorm';
 import { AccountQueryRepository } from './account.query-repository';
-import { CreateAccountDto } from './dto/create.dto';
-import { UpdateAccountDto } from './dto/update.dto';
+import { CreateAccountDto } from './dto/create-account.dto';
+import { UpdateAccountDto } from './dto/update-account.dto';
 
 @Injectable()
 export class AccountService {

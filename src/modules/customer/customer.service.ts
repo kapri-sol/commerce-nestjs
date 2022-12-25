@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { AccountQueryRepository } from '../account/account.query-repository';
 import { CustomerQueryRepository } from './customer.query-repository';
 import { CreateCustomerDto } from './dto/create-customer.dto';
-import { UpdateCustomerDto } from './dto/update.dto';
+import { UpdateCustomerDto } from './dto/update-customer.dto';
 
 @Injectable()
 export class CustomerService {

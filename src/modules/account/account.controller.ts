@@ -10,9 +10,9 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { SessionAuthGuard } from '@src/utils/guard/session-auth.guard';
 import { AccountService } from './account.service';
-import { CreateAccountDto } from './dto/create.dto';
+import { CreateAccountDto } from './dto/create-account.dto';
 import { FindAccountResponse } from './response/find.response';
-import { UpdateAccountDto } from './dto/update.dto';
+import { UpdateAccountDto } from './dto/update-account.dto';
 import { CreateAccountResponse } from './response/create.response';
 import { SessionAccountId } from '@src/utils/decorator/account-id.decorator';
 
