@@ -141,9 +141,9 @@ export class Account {
    * @param {string} [password]
    * @memberof Account
    */
-  update(email?: string, password?: string) {
-    if (email) {
-      this._email = email;
+  update(phone?: string, password?: string) {
+    if (phone) {
+      this._phone = phone;
     }
 
     if (password) {
