@@ -79,13 +79,9 @@ export class AccountService {
       throw new NotFoundException();
     }
 
-    if (updateAccountDto.phone) {
-      account.changePhone(updateAccountDto.phone);
-    }
+    const { phone, password } = updateAccountDto;
 
-    if (updateAccountDto.password) {
-      account.changePassword(updateAccountDto.password);
-    }
+    account.update(phone, password);
 
     return this.accountRepository.save(account);
   }
