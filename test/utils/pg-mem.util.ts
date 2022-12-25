@@ -1,7 +1,6 @@
 import { EntityClassOrSchema } from '@nestjs/typeorm/dist/interfaces/entity-class-or-schema.type';
-import { DataType, newDb } from 'pg-mem';
+import { newDb } from 'pg-mem';
 import { DataSource } from 'typeorm';
-import { v4 } from 'uuid';
 
 export const getMemDateSource = async (entities: EntityClassOrSchema[]) => {
   const db = newDb({
