@@ -11,9 +11,9 @@ import { ApiTags } from '@nestjs/swagger';
 import { SessionAuthGuard } from '@src/utils/guard/session-auth.guard';
 import { AccountService } from './account.service';
 import { CreateAccountDto } from './dto/create-account.dto';
-import { FindAccountResponse } from './response/find.response';
+import { FindAccountResponse } from './response/find-account.response';
 import { UpdateAccountDto } from './dto/update-account.dto';
-import { CreateAccountResponse } from './response/create.response';
+import { CreateAccountResponse } from './response/create-account.response';
 import { SessionAccountId } from '@src/utils/decorator/account-id.decorator';
 
 @ApiTags('Account')
