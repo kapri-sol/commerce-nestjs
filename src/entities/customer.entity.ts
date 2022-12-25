@@ -9,6 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Account } from './account.entity';
+import { Order } from './order.entity';
 import { Product } from './product.entity';
 
 @Entity()
@@ -23,6 +24,9 @@ export class Customer {
 
   @OneToMany(() => Product, (product) => product.seller)
   private _products: Product[];
+
+  @OneToOne(() => Order, (order: Order) => order.customer)
+  private _orders: Order[];
 
   @Column({
     name: 'name',
@@ -91,7 +95,18 @@ export class Customer {
     return this._address;
   }
 
-  updateCustomer(name?: string, address?: string) {
+  get orders(): Order[] {
+    return this._orders;
+  }
+
+  /**
+   * 고객 정보를 수정한다.
+   *
+   * @param {string} [name]
+   * @param {string} [address]
+   * @memberof Customer
+   */
+  update(name?: string, address?: string) {
     if (name) {
       this._name = name;
     }
