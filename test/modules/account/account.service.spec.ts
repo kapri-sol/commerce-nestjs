@@ -1,5 +1,5 @@
 import { AccountService } from '@src/modules/account/account.service';
-import { CreateAccountDto } from '@src/modules/account/dto/create.dto';
+import { CreateAccountDto } from '@src/modules/account/dto/create-account.dto';
 import {
   mock,
   instance,
@@ -11,7 +11,7 @@ import {
 import { faker } from '@faker-js/faker';
 import { plainToInstance } from 'class-transformer';
 import { Account } from '@src/entities/account.entity';
-import { UpdateAccountDto } from '@src/modules/account/dto/update.dto';
+import { UpdateAccountDto } from '@src/modules/account/dto/update-account.dto';
 import { AccountQueryRepository } from '@src/modules/account/account.query-repository';
 import { Repository } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';

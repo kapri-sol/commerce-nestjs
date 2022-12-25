@@ -11,7 +11,7 @@ import { AccountQueryRepository } from '@src/modules/account/account.query-repos
 import { CustomerQueryRepository } from '@src/modules/customer/customer.query-repository';
 import { CustomerService } from '@src/modules/customer/customer.service';
 import { CreateCustomerDto } from '@src/modules/customer/dto/create-customer.dto';
-import { UpdateCustomerDto } from '@src/modules/customer/dto/update.dto';
+import { UpdateCustomerDto } from '@src/modules/customer/dto/update-customer.dto';
 import { plainToInstance } from 'class-transformer';
 import { IBackup } from 'pg-mem';
 import { getMemDateSource } from 'test/utils/pg-mem.util';
@@ -79,6 +79,8 @@ describe('Customer Service', () => {
       CustomerQueryRepository,
     );
     customerService = module.get<CustomerService>(CustomerService);
+
+    await app.init();
   });
 
   afterEach(async () => {
