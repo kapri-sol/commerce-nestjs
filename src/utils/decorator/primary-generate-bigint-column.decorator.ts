@@ -11,18 +11,12 @@ export const PrimaryGenerateBigintColumn = (
       type: 'bigint',
       transformer: {
         to: (value?: bigint): string => {
-          try {
-            return typeof value === 'bigint' ? value.toString() : value;
-          } catch (err) {
-            console.log(err);
-          }
+          return typeof value === 'bigint' ? value.toString() : value;
         },
-        from: (value: string): bigint => {
-          try {
-            return typeof value === 'string' ? BigInt(value) : value;
-          } catch (err) {
-            console.log(err);
-          }
+        from: (value: string | number): bigint => {
+          return typeof value === 'string' || typeof value === 'number'
+            ? BigInt(value)
+            : value;
         },
       },
     }),
