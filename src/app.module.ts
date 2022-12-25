@@ -2,11 +2,15 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
-import { join } from 'path';
 import { NODE_ENV } from './utils/common/env.enum';
 import { AccountModule } from './modules/account/account.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CustomerModule } from './modules/customer/customer.module';
+import { Account } from './entities/account.entity';
+import { Customer } from './entities/customer.entity';
+import { Order } from './entities/order.entity';
+import { Product } from './entities/product.entity';
+import { Seller } from './entities/seller.entity';
 
 @Module({
   imports: [
@@ -27,7 +31,7 @@ import { CustomerModule } from './modules/customer/customer.module';
       }),
     }),
     TypeOrmModule.forRoot({
-      type: 'mysql',
+      type: 'postgres',
       host: process.env.DATABASE_HOST,
       port: +process.env.DATABASE_PORT,
       database: process.env.DATABASE_NAME,
@@ -35,7 +39,7 @@ import { CustomerModule } from './modules/customer/customer.module';
       password: process.env.DATABASE_PASSWORD,
       synchronize: process.env.NODE_ENV !== NODE_ENV.PRODUCTION,
       logging: process.env.NODE_ENV === NODE_ENV.DEVELOPMENT,
-      entities: [join(__dirname, '**', '*.entity{.ts,.js}')],
+      entities: [Account, Customer, Order, Product, Seller],
     }),
     AccountModule,
     CustomerModule,
