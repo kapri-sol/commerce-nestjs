@@ -72,7 +72,7 @@ export class CustomerService {
 
     const { name, address } = updateCustomerDto;
 
-    customer.updateCustomer(name, address);
+    customer.update(name, address);
 
     await this.customerRepository.save(customer);
   }
