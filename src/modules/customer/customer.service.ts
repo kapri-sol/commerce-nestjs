@@ -1,15 +1,19 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Customer } from '@src/entities/customer.entity';
+import { Repository } from 'typeorm';
 import { AccountQueryRepository } from '../account/account.query-repository';
-import { CustomerRepository } from './customer.repository';
-import { CreateCustomerDto } from './dto/create.dto';
+import { CustomerQueryRepository } from './customer.query-repository';
+import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update.dto';
 
 @Injectable()
 export class CustomerService {
   constructor(
     private readonly accountQueryRepository: AccountQueryRepository,
-    private readonly customerRepository: CustomerRepository,
+    private readonly customerQueryRepository: CustomerQueryRepository,
+    @InjectRepository(Customer)
+    private readonly customerRepository: Repository<Customer>,
   ) {}
 
   /**
@@ -40,7 +44,7 @@ export class CustomerService {
    * @memberof CustomerService
    */
   async findCustomerById(customerId: bigint): Promise<Customer> {
-    const customer = await this.customerRepository.findOneById(customerId);
+    const customer = await this.customerQueryRepository.findOneById(customerId);
 
     if (!customer) {
       throw new NotFoundException();
@@ -60,7 +64,7 @@ export class CustomerService {
     customerId: bigint,
     updateCustomerDto: UpdateCustomerDto,
   ) {
-    const customer = await this.customerRepository.findOneById(customerId);
+    const customer = await this.customerQueryRepository.findOneById(customerId);
 
     if (!customer) {
       throw new NotFoundException();
@@ -68,8 +72,7 @@ export class CustomerService {
 
     const { name, address } = updateCustomerDto;
 
-    customer.changeName(name);
-    customer.changeAddress(address);
+    customer.updateCustomer(name, address);
 
     await this.customerRepository.save(customer);
   }
@@ -80,8 +83,8 @@ export class CustomerService {
    * @param {bigint} customerId
    * @memberof CustomerService
    */
-  async removeCustomeById(customerId: bigint) {
-    const customer = await this.customerRepository.findOneById(customerId);
+  async removeCustomer(customerId: bigint) {
+    const customer = await this.customerQueryRepository.findOneById(customerId);
 
     if (!customer) {
       throw new NotFoundException();
