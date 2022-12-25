@@ -5,23 +5,33 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
   OneToOne,
   UpdateDateColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { PrimaryGenerateBigintColumn } from '@src/utils/decorator/primary-generate-bigint-column.decorator';
 import { Customer } from './customer.entity';
+import { Seller } from './seller.entity';
 
 @Entity()
 export class Account {
   @PrimaryGenerateBigintColumn({
-    name: 'account_id',
-    primaryKeyConstraintName: 'PK_ACCOUND_ID',
+    name: 'id',
   })
   private _id: bigint;
 
-  @OneToOne(() => Customer, (customer: Customer) => customer)
+  @OneToOne(() => Customer, (customer: Customer) => customer.account)
+  @JoinColumn({
+    name: 'customer_id',
+  })
   private _customer: Customer;
+
+  @OneToOne(() => Seller, (seller: Seller) => seller.account)
+  @JoinColumn({
+    name: 'seller_id',
+  })
+  private _seller: Seller;
 
   @Column({
     name: 'email',
@@ -81,12 +91,16 @@ export class Account {
     this._id = id;
   }
 
-  get customer() {
+  get customer(): Customer {
     return this._customer;
   }
 
   set customer(customer: Customer) {
     this._customer = customer;
+  }
+
+  get seller(): Seller {
+    return this._seller;
   }
 
   get email() {

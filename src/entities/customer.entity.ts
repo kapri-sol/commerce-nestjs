@@ -4,7 +4,6 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  JoinColumn,
   OneToMany,
   OneToOne,
   UpdateDateColumn,
@@ -14,20 +13,25 @@ import { Product } from './product.entity';
 
 @Entity()
 export class Customer {
-  @PrimaryGenerateBigintColumn()
+  @PrimaryGenerateBigintColumn({
+    name: 'id',
+  })
   private _id: bigint;
 
   @OneToOne(() => Account, (account: Account) => account.customer)
-  @JoinColumn()
   private _account: Account;
 
-  @OneToMany(() => Product, (product) => product.owner)
+  @OneToMany(() => Product, (product) => product.seller)
   private _products: Product[];
 
-  @Column()
+  @Column({
+    name: 'name',
+  })
   private _name: string;
 
-  @Column()
+  @Column({
+    name: 'address',
+  })
   private _address: string;
 
   @CreateDateColumn({
@@ -83,15 +87,17 @@ export class Customer {
     return this._name;
   }
 
-  changeName(name: string) {
-    this._name = name;
-  }
-
   get address() {
     return this._address;
   }
 
-  changeAddress(address: string) {
-    this._address = address;
+  updateCustomer(name?: string, address?: string) {
+    if (name) {
+      this._name = name;
+    }
+
+    if (address) {
+      this._address = address;
+    }
   }
 }
