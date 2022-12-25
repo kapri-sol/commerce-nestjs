@@ -19,7 +19,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "cross-env NODE_ENV=test jest --config ./test/jest-e2e.json",
-    "test:svc": "cross-env NODE_ENV=test jest --config ./test/jest-service.json"
+    "test:svc": "cross-env NODE_ENV=test jest --config ./test/jest-service.json",
+    "test:domain": "cross-env NODE_ENV=test jest --config ./test/jest-domain.json"
   },
   "dependencies": {
     "@fxts/core": "^0.11.0",
