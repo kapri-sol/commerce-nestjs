@@ -2,14 +2,23 @@ version: '3.7'
 services:
   database:
     container_name: local_database
-    image: mysql:5.7
-    restart: always
+    # image: mysql:5.7
+    # restart: always
+    # ports:
+    #   - 3306:3306
+    # environment:
+    #   - MYSQL_DATABASE=test
+    #   - MYSQL_ROOT_PASSWORD=1234
+    #   - TZ=Asia/Seoul
+    # command:
+    #   - --character-set-server=utf8mb4
+    #   - --collation-server=utf8mb4_general_ci
+
+    image: postgres
     ports:
-      - 3306:3306
+      - '5432:5432'
     environment:
-      - MYSQL_DATABASE=test
-      - MYSQL_ROOT_PASSWORD=1234
-      - TZ=Asia/Seoul
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_general_ci
+      POSTGRES_DB: test
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: 1234
+    command: postgres -c listen_addresses='*'
