@@ -9,7 +9,7 @@ import {
   OneToOne,
   UpdateDateColumn,
 } from 'typeorm';
-import { Order } from './order.entity';
+import { OrderItem } from './order-item.entity';
 import { Seller } from './seller.entity';
 
 @Entity()
@@ -25,11 +25,11 @@ export class Product {
   })
   private _seller: Seller;
 
-  @OneToOne(() => Order, (order) => order)
+  @OneToOne(() => OrderItem, (orderItem: OrderItem) => orderItem.product)
   @JoinColumn({
-    name: 'order_id',
+    name: 'order_item_id',
   })
-  private _order: Order;
+  private _orderItems: OrderItem[];
 
   @Column({
     name: 'name',
@@ -92,8 +92,8 @@ export class Product {
     return this._id;
   }
 
-  get order(): Order {
-    return this._order;
+  get orderItems(): OrderItem[] {
+    return this._orderItems;
   }
 
   get seller(): Seller {
