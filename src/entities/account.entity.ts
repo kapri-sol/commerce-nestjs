@@ -87,10 +87,6 @@ export class Account {
     return this._id;
   }
 
-  set id(id: bigint) {
-    this._id = id;
-  }
-
   get customer(): Customer {
     return this._customer;
   }
@@ -111,25 +107,47 @@ export class Account {
     return this._phone;
   }
 
-  changePhone(phone: string) {
-    this._phone = phone;
-  }
-
   get password() {
     return this._password;
   }
 
-  changePassword(password: string) {
-    this._password = password;
-  }
-
+  /**
+   * 계정 비밀번호를 해시해서 저장한다.
+   *
+   * @param {number} [roundOrSecret=10]
+   * @memberof Account
+   */
   @BeforeInsert()
   @BeforeUpdate()
-  async hashPassword() {
-    this._password = await bcrypt.hashSync(this.password, 10);
+  async hashPassword(roundOrSecret = 10) {
+    this._password = await bcrypt.hashSync(this.password, roundOrSecret);
   }
 
+  /**
+   * 비밀번호가 맞는지 확인한다.
+   *
+   * @param {string} password
+   * @return {*}
+   * @memberof Account
+   */
   validatePassword(password: string) {
     return bcrypt.compare(password, this._password);
+  }
+
+  /**
+   * 계정 정보를 수정한다.
+   *
+   * @param {string} [email]
+   * @param {string} [password]
+   * @memberof Account
+   */
+  update(email?: string, password?: string) {
+    if (email) {
+      this._email = email;
+    }
+
+    if (password) {
+      this._password = password;
+    }
   }
 }
