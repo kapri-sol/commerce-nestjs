@@ -4,10 +4,12 @@ import {
   DeleteDateColumn,
   Entity,
   JoinColumn,
-  OneToOne,
+  ManyToOne,
+  OneToMany,
   UpdateDateColumn,
 } from 'typeorm';
-import { Product } from './product.entity';
+import { Customer } from './customer.entity';
+import { OrderItem } from './order-item.entity';
 
 @Entity()
 export class Order {
@@ -16,11 +18,14 @@ export class Order {
   })
   private _id: bigint;
 
-  @OneToOne(() => Product, (product) => product.order)
+  @ManyToOne(() => Customer, (customer: Customer) => customer)
   @JoinColumn({
-    name: 'product_id',
+    name: 'customer_id',
   })
-  private _product: Product;
+  private _customer: Customer;
+
+  @OneToMany(() => OrderItem, (orderItem: OrderItem) => orderItem.order)
+  private _orderItems: OrderItem[];
 
   @CreateDateColumn({
     name: 'created_at',
@@ -37,13 +42,31 @@ export class Order {
   })
   private _deletedAt: Date;
 
-  static of() {}
+  /**
+   * 주문 인스턴스를 생성한다.
+   *
+   * @static
+   * @param {Customer} customer
+   * @param {OrderItem[]} orderItems
+   * @return {*}
+   * @memberof Order
+   */
+  static of(customer: Customer, orderItems: OrderItem[]) {
+    const order = new Order();
+    order._customer = customer;
+    order._orderItems = orderItems;
+    return order;
+  }
 
   get id(): bigint {
     return this._id;
   }
 
-  get product(): Product {
-    return this._product;
+  get orderItems(): OrderItem[] {
+    return this._orderItems;
+  }
+
+  get customer(): Customer {
+    return this._customer;
   }
 }
