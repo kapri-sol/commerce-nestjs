@@ -58,9 +58,22 @@ export class OrderItem {
       throw new BadRequestException();
     }
 
+    if (!product.isQuantityOrderable(count)) {
+      throw new BadRequestException();
+    }
+
     const orderItem = new OrderItem();
     orderItem._product = product;
     orderItem._count = count;
     return orderItem;
+  }
+
+  /**
+   * 상품을 주문한다.
+   *
+   * @memberof OrderItem
+   */
+  orderProduct() {
+    this._product.order(this._count);
   }
 }

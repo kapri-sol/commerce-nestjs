@@ -42,22 +42,6 @@ export class Order {
   })
   private _deletedAt: Date;
 
-  /**
-   * 주문 인스턴스를 생성한다.
-   *
-   * @static
-   * @param {Customer} customer
-   * @param {OrderItem[]} orderItems
-   * @return {*}
-   * @memberof Order
-   */
-  static of(customer: Customer, orderItems: OrderItem[]) {
-    const order = new Order();
-    order._customer = customer;
-    order._orderItems = orderItems;
-    return order;
-  }
-
   get id(): bigint {
     return this._id;
   }
@@ -68,5 +52,25 @@ export class Order {
 
   get customer(): Customer {
     return this._customer;
+  }
+
+  /**
+   * 주문 인스턴스를 생성한다.
+   *
+   * @static
+   * @param {Customer} customer
+   * @param {OrderItem[]} orderItems
+   * @return {*}  {Order}
+   * @memberof Order
+   */
+  static of(customer: Customer, orderItems: OrderItem[]): Order {
+    const order = new Order();
+    order._customer = customer;
+    order._orderItems = orderItems;
+    return order;
+  }
+
+  orderProducts() {
+    this._orderItems.forEach((orderItem) => orderItem.orderProduct());
   }
 }

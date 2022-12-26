@@ -19,12 +19,12 @@ describe('OrderItem Domain', () => {
     const account = initializeAccount();
     return Seller.of(name, address, account);
   };
-  const initializeProduct = () => {
+  const initializeProduct = (quantity = Number(faker.random.numeric())) => {
     const name = faker.commerce.productName();
     const description = faker.commerce.productDescription();
     const price = Number(faker.commerce.price());
     const seller = initializeSeller();
-    return Product.of(name, description, price, seller);
+    return Product.of(name, description, price, quantity, seller);
   };
 
   describe('of', () => {
@@ -57,6 +57,18 @@ describe('OrderItem Domain', () => {
       // given
       const product = initializeProduct();
       const count = -1;
+
+      // when
+      const createOrderItem = () => OrderItem.of(product, count);
+
+      // then
+      expect(createOrderItem).toThrowError(BadRequestException);
+    });
+
+    it('상품 개수가 주문할 개수보다 작으면 BadRequestException을 던진다.', () => {
+      // given
+      const product = initializeProduct();
+      const count = product.quantity + 1;
 
       // when
       const createOrderItem = () => OrderItem.of(product, count);

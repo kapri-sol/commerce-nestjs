@@ -4,6 +4,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Account } from '@src/entities/account.entity';
 import { Customer } from '@src/entities/customer.entity';
+import { OrderItem } from '@src/entities/order-item.entity';
 import { Order } from '@src/entities/order.entity';
 import { Product } from '@src/entities/product.entity';
 import { Seller } from '@src/entities/seller.entity';
@@ -47,18 +48,24 @@ describe('Product Service', () => {
       faker.commerce.product(),
       faker.commerce.productDescription(),
       Number(faker.commerce.price()),
+      Number(faker.commerce.price()),
       seller,
     );
     return productRepository.save(product);
   };
 
   beforeAll(async () => {
-    await getMemDateSource([Product, Seller, Account, Order, Customer]).then(
-      (data) => {
-        datasource = data.datasource;
-        backup = data.backup;
-      },
-    );
+    await getMemDateSource([
+      Product,
+      Seller,
+      Account,
+      Order,
+      Customer,
+      OrderItem,
+    ]).then((data) => {
+      datasource = data.datasource;
+      backup = data.backup;
+    });
 
     const module: TestingModule = await Test.createTestingModule({
       imports: [
@@ -101,6 +108,7 @@ describe('Product Service', () => {
         name: faker.commerce.product(),
         description: faker.commerce.productDescription(),
         price: Number(faker.commerce.price()),
+        quantity: Number(faker.commerce.price()),
       };
 
       // when

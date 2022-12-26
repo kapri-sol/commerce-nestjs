@@ -1,4 +1,3 @@
 export class CreateOrderDto {
-  productId: bigint;
-  customerId: bigint;
+  orderItemIds: bigint[];
 }

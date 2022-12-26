@@ -37,9 +37,9 @@ export class ProductService {
       throw new BadRequestException();
     }
 
-    const { name, description, price } = createProductDto;
+    const { name, description, price, quantity } = createProductDto;
 
-    const product = Product.of(name, description, price, seller);
+    const product = Product.of(name, description, price, quantity, seller);
 
     return this.productRepository.save(product);
   }
