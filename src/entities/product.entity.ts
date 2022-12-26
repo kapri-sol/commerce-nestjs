@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common';
 import { PrimaryGenerateBigintColumn } from '@src/utils/decorator/primary-generate-bigint-column.decorator';
 import {
   Column,
@@ -48,6 +49,11 @@ export class Product {
   private _price: number;
 
   @Column({
+    name: 'quantity',
+  })
+  private _quantity: number;
+
+  @Column({
     name: 'image',
     default: null,
   })
@@ -67,26 +73,6 @@ export class Product {
     name: 'deleted_at',
   })
   private _deletedAt: Date;
-
-  /**
-   * Product 인스턴스를 생성한다.
-   *
-   * @static
-   * @param {string} name 이름
-   * @param {string} description 설명
-   * @param {number} price 가격
-   * @param {Customer} seller 판매자
-   * @return {*}
-   * @memberof Product
-   */
-  static of(name: string, description: string, price: number, seller: Seller) {
-    const product = new Product();
-    product._name = name;
-    product._description = description;
-    product._price = price;
-    product._seller = seller;
-    return product;
-  }
 
   get id(): bigint {
     return this._id;
@@ -116,6 +102,42 @@ export class Product {
     return this._price;
   }
 
+  get quantity(): number {
+    return this._quantity;
+  }
+
+  /**
+   * Product 인스턴스를 생성한다.
+   *
+   * @static
+   * @param {string} name 이름
+   * @param {string} description 설명
+   * @param {number} price 가격
+   * @param {number} quantity 수량
+   * @param {Seller} seller 판매자
+   * @return {*}  {Product}
+   * @memberof Product
+   */
+  static of(
+    name: string,
+    description: string,
+    price: number,
+    quantity: number,
+    seller: Seller,
+  ): Product {
+    if (quantity <= 0) {
+      throw new BadRequestException();
+    }
+
+    const product = new Product();
+    product._name = name;
+    product._description = description;
+    product._price = price;
+    product._quantity = quantity;
+    product._seller = seller;
+    return product;
+  }
+
   /**
    * 상품의 정보를 수정한다.
    *
@@ -141,5 +163,30 @@ export class Product {
     if (image) {
       this._image = image;
     }
+  }
+
+  /**
+   * 상품을 수량만큼 주문한다.
+   *
+   * @param {number} count 주문 개수
+   * @memberof Product
+   */
+  order(count: number) {
+    this._quantity -= count;
+
+    if (this._quantity < 0) {
+      throw new BadRequestException();
+    }
+  }
+
+  /**
+   * 상품 수량이 주문할 만큼 있는지 확인한다.
+   *
+   * @param {*} count
+   * @return {*}  {boolean}
+   * @memberof Product
+   */
+  isQuantityOrderable(count): boolean {
+    return this._quantity > count;
   }
 }
