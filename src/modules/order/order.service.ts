@@ -40,11 +40,19 @@ export class OrderService {
       createOrderDto.orderItems.map(({ productId }) => productId),
     );
 
-    const orderItems = products.map((product) =>
+    const createOrderItems = products.map((product) =>
       OrderItem.of(product, productIdCounttMap.get(product.id)),
     );
 
+    console.log('createOrderItems', createOrderItems);
+
+    const orderItems = await this.orderItemRepository.save(createOrderItems);
+
+    console.log('orderItems', orderItems);
+
     const order = Order.of(customer, orderItems);
+
+    console.log('order', order);
 
     return this.orderRepository.save(order);
   }

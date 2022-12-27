@@ -25,7 +25,7 @@ export class Customer {
   @OneToMany(() => Product, (product) => product.seller)
   private _products: Product[];
 
-  @OneToOne(() => Order, (order: Order) => order.customer)
+  @OneToMany(() => Order, (order: Order) => order.customer)
   private _orders: Order[];
 
   @Column({

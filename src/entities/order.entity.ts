@@ -26,7 +26,9 @@ export class Order {
   })
   private _customer: Customer;
 
-  @OneToMany(() => OrderItem, (orderItem: OrderItem) => orderItem.order)
+  @OneToMany(() => OrderItem, (orderItem: OrderItem) => orderItem.order, {
+    cascade: true,
+  })
   private _orderItems: OrderItem[];
 
   @CreateDateColumn({

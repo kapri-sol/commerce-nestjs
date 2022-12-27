@@ -16,6 +16,7 @@ import { ProductQueryRepository } from '@src/modules/product/product.query-repos
 import { IBackup } from 'pg-mem';
 import { getMemDateSource } from 'test/utils/pg-mem.util';
 import { DataSource, Repository } from 'typeorm';
+import { inspect } from 'util';
 
 describe('Order Service', () => {
   let app: INestApplication;
@@ -108,6 +109,12 @@ describe('Order Service', () => {
     orderQueryRepository =
       module.get<OrderQueryRepository>(OrderQueryRepository);
     orderService = module.get<OrderService>(OrderService);
+
+    await app.init();
+  });
+
+  afterAll(async () => {
+    await app.close();
   });
 
   afterEach(async () => {
@@ -133,10 +140,10 @@ describe('Order Service', () => {
       // when
       const order = await orderService.createOrder(customer.id, createOrderDto);
 
-      const createOrder = await orderQueryRepository.findOneById(order.id);
+      // const createOrder = await orderQueryRepository.findOneById(order.id);
 
       // then
-      console.log(createOrder);
+      // console.log(createOrder);
     });
   });
 });

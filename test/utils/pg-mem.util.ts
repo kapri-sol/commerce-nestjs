@@ -53,7 +53,9 @@ export const getMemDateSource = async (entities: EntityClassOrSchema[]) => {
   const datasource: DataSource = await db.adapters.createTypeormDataSource({
     type: 'postgres',
     entities,
-    // logging: true,
+    logging: true,
+    bigNumberStrings: true,
+    supportBigNumbers: true,
   });
   await datasource.initialize();
   await datasource.synchronize();

@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import { PrimaryGenerateBigintColumn } from '@src/utils/decorator/primary-generate-bigint-column.decorator';
-import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { Order } from './order.entity';
 import { Product } from './product.entity';
 
@@ -19,7 +19,7 @@ export class OrderItem {
   })
   private _product: Product;
 
-  @OneToMany(() => Order, (order: Order) => order.orderItems)
+  @ManyToOne(() => Order, (order: Order) => order.orderItems)
   @JoinColumn({
     name: 'order_id',
   })
