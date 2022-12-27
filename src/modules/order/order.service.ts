@@ -1,9 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Customer } from '@src/entities/customer.entity';
+import { OrderItem } from '@src/entities/order-item.entity';
 import { Order } from '@src/entities/order.entity';
 import { Repository } from 'typeorm';
 import { CustomerQueryRepository } from '../customer/customer.query-repository';
+import { ProductQueryRepository } from '../product/product.query-repository';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { OrderItemQueryRepository } from './order-item.query-repository';
 import { OrderQueryRepository } from './order.query-repository';
@@ -13,8 +15,9 @@ export class OrderService {
   constructor(
     @InjectRepository(Order)
     private readonly orderRepository: Repository<Order>,
-    private readonly orderQueryRepository: OrderQueryRepository,
-    private readonly orderItemQueryRepository: OrderItemQueryRepository,
+    @InjectRepository(OrderItem)
+    private readonly orderItemRepository: Repository<OrderItem>,
+    private readonly productQueryRepository: ProductQueryRepository,
     @InjectRepository(Customer)
     private readonly customerQueryRepository: CustomerQueryRepository,
   ) {}
@@ -26,13 +29,20 @@ export class OrderService {
       throw new BadRequestException();
     }
 
-    const orderItems = await this.orderItemQueryRepository.findByIds(
-      createOrderDto.orderItemIds,
+    const productIdCounttMap = new Map(
+      createOrderDto.orderItems.map(({ productId, count }) => [
+        productId,
+        count,
+      ]),
     );
 
-    if (orderItems.length !== createOrderDto.orderItemIds.length) {
-      throw new BadRequestException();
-    }
+    const products = await this.productQueryRepository.findByIds(
+      createOrderDto.orderItems.map(({ productId }) => productId),
+    );
+
+    const orderItems = products.map((product) =>
+      OrderItem.of(product, productIdCounttMap.get(product.id)),
+    );
 
     const order = Order.of(customer, orderItems);
 

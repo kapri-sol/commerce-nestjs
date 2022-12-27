@@ -12,7 +12,8 @@ export class OrderQueryRepository {
 
   findOneById(id: bigint) {
     return this.orderRepository
-      .createQueryBuilder()
+      .createQueryBuilder('order')
+      .innerJoinAndSelect('order._orderItems', 'order_item')
       .where('deleted_at is null')
       .where('id = :id', {
         id: id.toString(),

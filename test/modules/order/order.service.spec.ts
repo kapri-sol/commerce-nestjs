@@ -12,6 +12,7 @@ import { CreateOrderDto } from '@src/modules/order/dto/create-order.dto';
 import { OrderItemQueryRepository } from '@src/modules/order/order-item.query-repository';
 import { OrderQueryRepository } from '@src/modules/order/order.query-repository';
 import { OrderService } from '@src/modules/order/order.service';
+import { ProductQueryRepository } from '@src/modules/product/product.query-repository';
 import { IBackup } from 'pg-mem';
 import { getMemDateSource } from 'test/utils/pg-mem.util';
 import { DataSource, Repository } from 'typeorm';
@@ -85,7 +86,12 @@ describe('Order Service', () => {
         TypeOrmModule.forRoot(),
         TypeOrmModule.forFeature([Order, OrderItem, Product, Customer, Seller]),
       ],
-      providers: [OrderService, OrderQueryRepository, OrderItemQueryRepository],
+      providers: [
+        ProductQueryRepository,
+        OrderService,
+        OrderQueryRepository,
+        OrderItemQueryRepository,
+      ],
     })
       .overrideProvider(DataSource)
       .useValue(datasource)
@@ -114,15 +120,23 @@ describe('Order Service', () => {
       const customer = await initializeCustomer();
 
       const orderItem = await initializeOrderItem();
+
       const createOrderDto: CreateOrderDto = {
-        orderItemIds: [orderItem.id],
+        orderItems: [
+          {
+            productId: orderItem.product.id,
+            count: orderItem.count,
+          },
+        ],
       };
 
       // when
       const order = await orderService.createOrder(customer.id, createOrderDto);
 
+      const createOrder = await orderQueryRepository.findOneById(order.id);
+
       // then
-      console.log(order);
+      console.log(createOrder);
     });
   });
 });

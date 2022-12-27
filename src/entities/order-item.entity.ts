@@ -4,7 +4,9 @@ import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 import { Order } from './order.entity';
 import { Product } from './product.entity';
 
-@Entity()
+@Entity({
+  name: 'order_item',
+})
 export class OrderItem {
   @PrimaryGenerateBigintColumn({
     name: 'id',

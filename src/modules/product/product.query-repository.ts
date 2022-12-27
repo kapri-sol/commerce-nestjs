@@ -31,4 +31,13 @@ export class ProductQueryRepository {
       })
       .getMany();
   }
+
+  findByIds(ids: bigint[]) {
+    return this.productRepository
+      .createQueryBuilder()
+      .select()
+      .where('deleted_at is null')
+      .whereInIds(ids.map((id) => id.toString()))
+      .getMany();
+  }
 }

@@ -1,3 +1,8 @@
 export class CreateOrderDto {
-  orderItemIds: bigint[];
+  orderItems: CreateOrderItemDto[];
+}
+
+export class CreateOrderItemDto {
+  productId: bigint;
+  count: number;
 }

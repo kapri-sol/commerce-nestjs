@@ -11,7 +11,9 @@ import {
 import { Customer } from './customer.entity';
 import { OrderItem } from './order-item.entity';
 
-@Entity()
+@Entity({
+  name: 'order',
+})
 export class Order {
   @PrimaryGenerateBigintColumn({
     name: 'id',
