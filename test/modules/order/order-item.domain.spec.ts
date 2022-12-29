@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { BadRequestException } from '@nestjs/common';
 import { Account } from '@src/entities/account.entity';
-import { OrderItem } from '@src/entities/order-item.entity';
+import { OrderItem, OrderItemStatus } from '@src/entities/order-item.entity';
 import { Product } from '@src/entities/product.entity';
 import { Seller } from '@src/entities/seller.entity';
 
@@ -30,8 +30,8 @@ describe('OrderItem Domain', () => {
   describe('of', () => {
     it('주문 항목을 생성한다.', () => {
       // given
-      const product = initializeProduct();
-      const count = Number(faker.random.numeric());
+      const product = initializeProduct(5);
+      const count = 3;
 
       // when
       const orderItem = OrderItem.of(product, count);
@@ -75,6 +75,64 @@ describe('OrderItem Domain', () => {
 
       // then
       expect(createOrderItem).toThrowError(BadRequestException);
+    });
+  });
+
+  describe('changeStatus', () => {
+    it('주문 상태를 변경한다.', () => {
+      // given
+      const product = initializeProduct(5);
+      const count = 2;
+      const orderItem = OrderItem.of(product, count);
+
+      // when
+      orderItem.changeStatus(OrderItemStatus.CONFIRMED);
+
+      // then
+      expect(orderItem.status).toBe(OrderItemStatus.CONFIRMED);
+    });
+
+    it('주문 상태를 PENDING으로 변경하려고 하면 BadRequestException을 던진다.', () => {
+      // given
+      const product = initializeProduct(5);
+      const count = 2;
+      const orderItem = OrderItem.of(product, count);
+
+      // when
+      const changeOrderItemStatus = () =>
+        orderItem.changeStatus(OrderItemStatus.PENDING);
+
+      // then
+      expect(changeOrderItemStatus).toThrowError(BadRequestException);
+    });
+
+    it('주문 상태를 CANCEL으로 변경하려고 하면 BadRequestException을 던진다.', () => {
+      // given
+      const product = initializeProduct(5);
+      const count = 2;
+      const orderItem = OrderItem.of(product, count);
+
+      // when
+      const changeOrderItemStatus = () =>
+        orderItem.changeStatus(OrderItemStatus.CANCELLED);
+
+      // then
+      expect(changeOrderItemStatus).toThrowError(BadRequestException);
+    });
+  });
+
+  describe('cancle', () => {
+    it('주문 항목 상태가 준비중이면 취소된다.', () => {
+      // given
+      const product = initializeProduct(5);
+      const count = 2;
+      const orderItem = OrderItem.of(product, count);
+
+      // when
+      orderItem.cancle();
+
+      // then
+      expect(orderItem.status).toBe(OrderItemStatus.CANCELLED);
     });
   });
 });

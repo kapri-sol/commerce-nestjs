@@ -18,93 +18,61 @@ export class Product {
   @PrimaryGenerateBigintColumn({
     name: 'id',
   })
-  private _id: bigint;
+  id: bigint;
 
   @ManyToOne(() => Seller, (seller: Seller) => seller.products)
   @JoinColumn({
     name: 'seller_id',
   })
-  private _seller: Seller;
+  seller: Seller;
 
   @OneToOne(() => OrderItem, (orderItem: OrderItem) => orderItem.product)
   @JoinColumn({
     name: 'order_item_id',
   })
-  private _orderItems: OrderItem[];
+  orderItems: OrderItem[];
 
   @Column({
     name: 'name',
   })
-  private _name: string;
+  name: string;
 
   @Column({
     type: 'text',
     name: 'description',
   })
-  private _description: string;
+  description: string;
 
   @Column({
     name: 'price',
   })
-  private _price: number;
+  price: number;
 
   @Column({
     name: 'quantity',
   })
-  private _quantity: number;
+  quantity: number;
 
   @Column({
     name: 'image',
     default: null,
   })
-  private _image: string;
+  image: string;
 
   @CreateDateColumn({
     name: 'created_at',
   })
-  private _createdAt: Date;
+  createdAt: Date;
 
   @UpdateDateColumn({
     name: 'updated_at',
   })
-  private _updatedAt: Date;
+  updatedAt: Date;
 
   @DeleteDateColumn({
     name: 'deleted_at',
   })
-  private _deletedAt: Date;
-
-  get id(): bigint {
-    return this._id;
-  }
-
-  get orderItems(): OrderItem[] {
-    return this._orderItems;
-  }
-
-  get seller(): Seller {
-    return this._seller;
-  }
-
-  get name(): string {
-    return this._name;
-  }
-
-  get image(): string {
-    return this._image;
-  }
-
-  get description(): string {
-    return this._description;
-  }
-
-  get price(): number {
-    return this._price;
-  }
-
-  get quantity(): number {
-    return this._quantity;
-  }
+  deletedAt: Date;
 
   /**
    * Product 인스턴스를 생성한다.
@@ -130,11 +98,11 @@ export class Product {
     }
 
     const product = new Product();
-    product._name = name;
-    product._description = description;
-    product._price = price;
-    product._quantity = quantity;
-    product._seller = seller;
+    product.name = name;
+    product.description = description;
+    product.price = price;
+    product.quantity = quantity;
+    product.seller = seller;
     return product;
   }
 
@@ -149,19 +117,19 @@ export class Product {
    */
   update(name?: string, description?: string, price?: number, image?: string) {
     if (name) {
-      this._name = name;
+      this.name = name;
     }
 
     if (description) {
-      this._description = description;
+      this.description = description;
     }
 
     if (price) {
-      this._price = price;
+      this.price = price;
     }
 
     if (image) {
-      this._image = image;
+      this.image = image;
     }
   }
 
@@ -172,9 +140,9 @@ export class Product {
    * @memberof Product
    */
   order(count: number) {
-    this._quantity -= count;
+    this.quantity -= count;
 
-    if (this._quantity < 0) {
+    if (this.quantity < 0) {
       throw new BadRequestException();
     }
   }
@@ -187,6 +155,6 @@ export class Product {
    * @memberof Product
    */
   isQuantityOrderable(count): boolean {
-    return this._quantity > count;
+    return this.quantity > count;
   }
 }

@@ -18,45 +18,49 @@ export class Order {
   @PrimaryGenerateBigintColumn({
     name: 'id',
   })
-  private _id: bigint;
+  id: bigint;
 
   @ManyToOne(() => Customer, (customer: Customer) => customer)
   @JoinColumn({
     name: 'customer_id',
   })
-  private _customer: Customer;
+  customer: Customer;
 
   @OneToMany(() => OrderItem, (orderItem: OrderItem) => orderItem.order, {
     cascade: true,
   })
-  private _orderItems: OrderItem[];
+  orderItems: OrderItem[];
 
   @CreateDateColumn({
     name: 'created_at',
   })
-  private _createdAt: Date;
+  createdAt: Date;
 
   @UpdateDateColumn({
     name: 'updated_at',
   })
-  private _updatedAt: Date;
+  updatedAt: Date;
 
   @DeleteDateColumn({
     name: 'deleted_at',
   })
-  private _deletedAt: Date;
+  deletedAt: Date;
 
-  get id(): bigint {
-    return this._id;
-  }
+  // get id(): bigint {
+  //   return this._id;
+  // }
 
-  get orderItems(): OrderItem[] {
-    return this._orderItems;
-  }
+  // get orderItems(): OrderItem[] {
+  //   return this._orderItems;
+  // }
 
-  get customer(): Customer {
-    return this._customer;
-  }
+  // set orderItems(orderItesms: OrderItem[]) {
+  //   this._orderItems = orderItesms;
+  // }
+
+  // get customer(): Customer {
+  //   return this._customer;
+  // }
 
   /**
    * 주문 인스턴스를 생성한다.
@@ -69,12 +73,13 @@ export class Order {
    */
   static of(customer: Customer, orderItems: OrderItem[]): Order {
     const order = new Order();
-    order._customer = customer;
-    order._orderItems = orderItems;
+    order.customer = customer;
+    orderItems.forEach((orderItem) => orderItem.setOrder(order));
+    order.orderItems = orderItems;
     return order;
   }
 
   orderProducts() {
-    this._orderItems.forEach((orderItem) => orderItem.orderProduct());
+    this.orderItems.forEach((orderItem) => orderItem.orderProduct());
   }
 }

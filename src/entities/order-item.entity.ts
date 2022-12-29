@@ -4,6 +4,14 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { Order } from './order.entity';
 import { Product } from './product.entity';
 
+export enum OrderItemStatus {
+  PENDING = 'PENDING',
+  CONFIRMED = 'CONFIRMED',
+  SHIPPED = 'SHIPPED',
+  DELIVERED = 'DELIVERED',
+  CANCELLED = 'CANCELLED',
+}
+
 @Entity({
   name: 'order_item',
 })
@@ -11,40 +19,30 @@ export class OrderItem {
   @PrimaryGenerateBigintColumn({
     name: 'id',
   })
-  private _id: bigint;
+  id: bigint;
 
   @OneToOne(() => Product, (product: Product) => product.orderItems)
   @JoinColumn({
     name: 'product_id',
   })
-  private _product: Product;
+  product: Product;
 
   @ManyToOne(() => Order, (order: Order) => order.orderItems)
   @JoinColumn({
     name: 'order_id',
   })
-  private _order: Order;
+  order: Order;
 
   @Column({
     name: 'count',
   })
-  private _count: number;
+  count: number;
 
-  get id() {
-    return this._id;
-  }
-
-  get product(): Product {
-    return this._product;
-  }
-
-  get order(): Order {
-    return this._order;
-  }
-
-  get count(): number {
-    return this._count;
-  }
+  @Column({
+    name: 'status',
+    default: OrderItemStatus.PENDING,
+  })
+  status: OrderItemStatus;
 
   /**
    * 주문 항목 instance를 생성한다.
@@ -65,8 +63,9 @@ export class OrderItem {
     }
 
     const orderItem = new OrderItem();
-    orderItem._product = product;
-    orderItem._count = count;
+    orderItem.product = product;
+    orderItem.count = count;
+    orderItem.status = OrderItemStatus.PENDING;
     return orderItem;
   }
 
@@ -76,6 +75,35 @@ export class OrderItem {
    * @memberof OrderItem
    */
   orderProduct() {
-    this._product.order(this._count);
+    this.product.order(this.count);
+  }
+
+  setOrder(order: Order) {
+    this.order = order;
+  }
+
+  private isCancellable(): boolean {
+    return (
+      this.status === OrderItemStatus.PENDING ||
+      this.status === OrderItemStatus.CONFIRMED
+    );
+  }
+
+  cancle() {
+    if (!this.isCancellable) {
+      throw new BadRequestException();
+    }
+    this.status = OrderItemStatus.CANCELLED;
+  }
+
+  changeStatus(status: OrderItemStatus) {
+    if (
+      status === OrderItemStatus.PENDING ||
+      status === OrderItemStatus.CANCELLED
+    ) {
+      throw new BadRequestException();
+    }
+
+    this.status = status;
   }
 }

@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Customer } from '@src/entities/customer.entity';
 import { OrderItem } from '@src/entities/order-item.entity';
@@ -15,14 +19,27 @@ export class OrderService {
   constructor(
     @InjectRepository(Order)
     private readonly orderRepository: Repository<Order>,
+    private readonly orderQueryRepository: OrderQueryRepository,
     @InjectRepository(OrderItem)
     private readonly orderItemRepository: Repository<OrderItem>,
+    private readonly orderItemQueryRepository: OrderItemQueryRepository,
     private readonly productQueryRepository: ProductQueryRepository,
     @InjectRepository(Customer)
     private readonly customerQueryRepository: CustomerQueryRepository,
   ) {}
 
-  async createOrder(customerId: bigint, createOrderDto: CreateOrderDto) {
+  /**
+   * 주문을 생성한다.
+   *
+   * @param {bigint} customerId
+   * @param {CreateOrderDto} createOrderDto
+   * @return {*}  {Promise<bigint>}
+   * @memberof OrderService
+   */
+  async createOrder(
+    customerId: bigint,
+    createOrderDto: CreateOrderDto,
+  ): Promise<bigint> {
     const customer = await this.customerQueryRepository.findOneById(customerId);
 
     if (!customer) {
@@ -40,20 +57,40 @@ export class OrderService {
       createOrderDto.orderItems.map(({ productId }) => productId),
     );
 
-    const createOrderItems = products.map((product) =>
+    const orderItems = products.map((product) =>
       OrderItem.of(product, productIdCounttMap.get(product.id)),
     );
 
-    console.log('createOrderItems', createOrderItems);
-
-    const orderItems = await this.orderItemRepository.save(createOrderItems);
-
-    console.log('orderItems', orderItems);
-
     const order = Order.of(customer, orderItems);
 
-    console.log('order', order);
+    const { id } = await this.orderRepository.save(order);
 
-    return this.orderRepository.save(order);
+    return id;
+  }
+
+  findOrder(id: bigint): Promise<Order> {
+    return this.orderQueryRepository.findOneById(id);
+  }
+
+  findOrders(customerId: bigint): Promise<Order[]> {
+    return this.orderQueryRepository.findByCustomerId(customerId);
+  }
+
+  async cancleOrderItem(orderItemId: bigint): Promise<void> {
+    const orderItem = await this.orderItemQueryRepository.findOneById(
+      orderItemId,
+    );
+
+    if (!orderItem) {
+      throw new NotFoundException();
+    }
+
+    orderItem.cancle();
+
+    try {
+      await this.orderItemRepository.save(orderItem);
+    } catch (err) {
+      console.error(err);
+    }
   }
 }

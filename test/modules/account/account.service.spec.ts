@@ -15,6 +15,7 @@ import { Customer } from '@src/entities/customer.entity';
 import { Seller } from '@src/entities/seller.entity';
 import { Product } from '@src/entities/product.entity';
 import { Order } from '@src/entities/order.entity';
+import { OrderItem } from '@src/entities/order-item.entity';
 
 describe('Account Service', () => {
   let datasource: DataSource;
@@ -35,12 +36,17 @@ describe('Account Service', () => {
   };
 
   beforeAll(async () => {
-    await getMemDateSource([Account, Customer, Seller, Product, Order]).then(
-      (data) => {
-        datasource = data.datasource;
-        backup = data.backup;
-      },
-    );
+    await getMemDateSource([
+      Account,
+      Customer,
+      Seller,
+      Product,
+      Order,
+      OrderItem,
+    ]).then((data) => {
+      datasource = data.datasource;
+      backup = data.backup;
+    });
 
     const module: TestingModule = await Test.createTestingModule({
       imports: [
@@ -141,7 +147,7 @@ describe('Account Service', () => {
 
       // then
       expect(updateAccount.id).toBe(account.id);
-      expect(updateAccount.phone).toBe(account.phone);
+      expect(updateAccount.phone).toBe(updateAccountDto.phone);
       expect(isValid).toBe(true);
     });
 
