@@ -4,8 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Customer } from '@src/entities/customer.entity';
-import { OrderItem } from '@src/entities/order-item.entity';
+import { OrderItem, OrderItemStatus } from '@src/entities/order-item.entity';
 import { Order } from '@src/entities/order.entity';
 import { Repository } from 'typeorm';
 import { CustomerQueryRepository } from '../customer/customer.query-repository';
@@ -17,15 +16,14 @@ import { OrderQueryRepository } from './order.query-repository';
 @Injectable()
 export class OrderService {
   constructor(
+    private readonly customerQueryRepository: CustomerQueryRepository,
+    private readonly productQueryRepository: ProductQueryRepository,
     @InjectRepository(Order)
     private readonly orderRepository: Repository<Order>,
-    private readonly orderQueryRepository: OrderQueryRepository,
     @InjectRepository(OrderItem)
     private readonly orderItemRepository: Repository<OrderItem>,
+    private readonly orderQueryRepository: OrderQueryRepository,
     private readonly orderItemQueryRepository: OrderItemQueryRepository,
-    private readonly productQueryRepository: ProductQueryRepository,
-    @InjectRepository(Customer)
-    private readonly customerQueryRepository: CustomerQueryRepository,
   ) {}
 
   /**
@@ -76,7 +74,10 @@ export class OrderService {
     return this.orderQueryRepository.findByCustomerId(customerId);
   }
 
-  async cancleOrderItem(orderItemId: bigint): Promise<void> {
+  async updateOrderItemStatus(
+    orderItemId: bigint,
+    updateOrderItemStatus: OrderItemStatus,
+  ) {
     const orderItem = await this.orderItemQueryRepository.findOneById(
       orderItemId,
     );
@@ -85,12 +86,16 @@ export class OrderService {
       throw new NotFoundException();
     }
 
-    orderItem.cancle();
-
-    try {
-      await this.orderItemRepository.save(orderItem);
-    } catch (err) {
-      console.error(err);
+    if (updateOrderItemStatus === OrderItemStatus.CONFIRMED) {
+      orderItem.confirm();
+    } else if (updateOrderItemStatus === OrderItemStatus.SHIPPED) {
+      orderItem.ship();
+    } else if (updateOrderItemStatus === OrderItemStatus.DELIVERED) {
+      orderItem.delivery();
+    } else if (updateOrderItemStatus === OrderItemStatus.CANCELLED) {
+      orderItem.cancel();
     }
+
+    await this.orderItemRepository.save(orderItem);
   }
 }

@@ -11,6 +11,7 @@ import { Customer } from './entities/customer.entity';
 import { Order } from './entities/order.entity';
 import { Product } from './entities/product.entity';
 import { Seller } from './entities/seller.entity';
+import { OrderItem } from './entities/order-item.entity';
 
 @Module({
   imports: [
@@ -39,7 +40,7 @@ import { Seller } from './entities/seller.entity';
       password: process.env.DATABASE_PASSWORD,
       synchronize: process.env.NODE_ENV !== NODE_ENV.PRODUCTION,
       logging: process.env.NODE_ENV === NODE_ENV.DEVELOPMENT,
-      entities: [Account, Customer, Order, Product, Seller],
+      entities: [Account, Customer, Order, Product, Seller, OrderItem],
     }),
     AccountModule,
     CustomerModule,

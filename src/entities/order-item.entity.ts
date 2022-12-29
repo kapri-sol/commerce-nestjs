@@ -69,11 +69,6 @@ export class OrderItem {
     return orderItem;
   }
 
-  /**
-   * 상품을 주문한다.
-   *
-   * @memberof OrderItem
-   */
   orderProduct() {
     this.product.order(this.count);
   }
@@ -82,28 +77,50 @@ export class OrderItem {
     this.order = order;
   }
 
-  private isCancellable(): boolean {
+  private get isCancellable(): boolean {
     return (
       this.status === OrderItemStatus.PENDING ||
       this.status === OrderItemStatus.CONFIRMED
     );
   }
 
-  cancle() {
+  private get isConfirmable(): boolean {
+    return this.status === OrderItemStatus.PENDING;
+  }
+
+  private get isShipable(): boolean {
+    return this.status === OrderItemStatus.CONFIRMED;
+  }
+
+  private get isDeliverable(): boolean {
+    return this.status === OrderItemStatus.SHIPPED;
+  }
+
+  confirm() {
+    if (!this.isConfirmable) {
+      throw new BadRequestException();
+    }
+    this.status = OrderItemStatus.CONFIRMED;
+  }
+
+  ship() {
+    if (!this.isShipable) {
+      throw new BadRequestException();
+    }
+    this.status = OrderItemStatus.SHIPPED;
+  }
+
+  delivery() {
+    if (!this.isDeliverable) {
+      throw new BadRequestException();
+    }
+    this.status = OrderItemStatus.DELIVERED;
+  }
+
+  cancel() {
     if (!this.isCancellable) {
       throw new BadRequestException();
     }
     this.status = OrderItemStatus.CANCELLED;
-  }
-
-  changeStatus(status: OrderItemStatus) {
-    if (
-      status === OrderItemStatus.PENDING ||
-      status === OrderItemStatus.CANCELLED
-    ) {
-      throw new BadRequestException();
-    }
-
-    this.status = status;
   }
 }

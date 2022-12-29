@@ -8,6 +8,7 @@ import { OrderItem, OrderItemStatus } from '@src/entities/order-item.entity';
 import { Order } from '@src/entities/order.entity';
 import { Product } from '@src/entities/product.entity';
 import { Seller } from '@src/entities/seller.entity';
+import { CustomerQueryRepository } from '@src/modules/customer/customer.query-repository';
 import { CreateOrderDto } from '@src/modules/order/dto/create-order.dto';
 import { OrderItemQueryRepository } from '@src/modules/order/order-item.query-repository';
 import { OrderQueryRepository } from '@src/modules/order/order.query-repository';
@@ -85,8 +86,8 @@ describe('Order Service', () => {
       Product,
       Seller,
       Account,
-      Order,
       Customer,
+      Order,
       OrderItem,
     ]).then((data) => {
       datasource = data.datasource;
@@ -96,9 +97,17 @@ describe('Order Service', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         TypeOrmModule.forRoot(),
-        TypeOrmModule.forFeature([Order, OrderItem, Product, Customer, Seller]),
+        TypeOrmModule.forFeature([
+          Order,
+          OrderItem,
+          Product,
+          Customer,
+          Seller,
+          Account,
+        ]),
       ],
       providers: [
+        CustomerQueryRepository,
         ProductQueryRepository,
         OrderService,
         OrderQueryRepository,
@@ -211,38 +220,77 @@ describe('Order Service', () => {
     });
   });
 
-  describe('cancelOrderItem', () => {
-    it('주문 항목을 id로 취소한다.', async () => {
+  describe('updateOrderItemStatus', () => {
+    it('( 판매자가 ) 주문 항목을 확인한다', async () => {
       // given
-      const customer = await initializeCustomer();
-      const order = await initializeOrder(customer);
-      const createOrder = await orderRepository.save(order);
-      const orderItem = createOrder.orderItems[0];
+      const createOrderItem = await initializeOrderItem();
+      const orderItem = await orderItemRepository.save(createOrderItem);
+      const orderItemStatus = OrderItemStatus.CONFIRMED;
 
       // when
-      await orderService.cancleOrderItem(orderItem.id);
+      await orderService.updateOrderItemStatus(orderItem.id, orderItemStatus);
 
-      const cancelOrderItem = await orderItemQueryRepository.findOneById(
+      const updateOrderItem = await orderItemQueryRepository.findOneById(
         orderItem.id,
       );
 
       // then
-      expect(cancelOrderItem.id).toBe(orderItem.id);
-      expect(cancelOrderItem.status).toBe(OrderItemStatus.CANCELLED);
+
+      expect(updateOrderItem.status).toBe(orderItemStatus);
     });
 
-    it('상태가 PENDING이면, 주문 항목을 id로 취소할 때, BadRequestException을 던진다 .', async () => {
+    it('( 판매자가 ) 주문 항목을 출하하다.', async () => {
       // given
-      const customer = await initializeCustomer();
-      const order = await initializeOrder(customer);
-      const createOrder = await orderRepository.save(order);
-      const orderItem = createOrder.orderItems[0];
+      const createOrderItem = await initializeOrderItem();
+      createOrderItem.confirm();
+      const orderItem = await orderItemRepository.save(createOrderItem);
+      const orderItemStatus = OrderItemStatus.SHIPPED;
 
       // when
-      const cancleOrderItem = () => orderService.cancleOrderItem(orderItem.id);
+      await orderService.updateOrderItemStatus(orderItem.id, orderItemStatus);
+
+      const updateOrderItem = await orderItemQueryRepository.findOneById(
+        orderItem.id,
+      );
 
       // then
-      expect(cancleOrderItem).toThrowError(BadRequestException);
+      expect(updateOrderItem.status).toBe(orderItemStatus);
+    });
+
+    it('( 배달자가 ) 주문 항목을 배달한다.', async () => {
+      // given
+      const createOrderItem = await initializeOrderItem();
+      createOrderItem.confirm();
+      createOrderItem.ship();
+      const orderItem = await orderItemRepository.save(createOrderItem);
+      const orderItemStatus = OrderItemStatus.DELIVERED;
+
+      // when
+      await orderService.updateOrderItemStatus(orderItem.id, orderItemStatus);
+
+      const updateOrderItem = await orderItemQueryRepository.findOneById(
+        orderItem.id,
+      );
+
+      // then
+      expect(updateOrderItem.status).toBe(orderItemStatus);
+    });
+
+    it('( 구매자가 )주문 항목을 취소한다.', async () => {
+      // given
+      const createOrderItem = await initializeOrderItem();
+      const orderItem = await orderItemRepository.save(createOrderItem);
+      const orderItemStatus = OrderItemStatus.CANCELLED;
+
+      // when
+      await orderService.updateOrderItemStatus(orderItem.id, orderItemStatus);
+
+      const updateOrderItem = await orderItemQueryRepository.findOneById(
+        orderItem.id,
+      );
+
+      // then
+      expect(updateOrderItem.status).toBe(orderItemStatus);
     });
   });
 });
