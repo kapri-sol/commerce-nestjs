@@ -16,38 +16,38 @@ export class Seller {
   @PrimaryGenerateBigintColumn({
     name: 'id',
   })
-  private _id: bigint;
+  id: bigint;
 
   @OneToOne(() => Account, (account: Account) => account.seller)
-  private _account: Account;
+  account: Account;
 
   @OneToMany(() => Product, (product: Product) => product.seller)
-  private _products: Product[];
+  products: Product[];
 
   @Column({
     name: 'name',
   })
-  private _name: string;
+  name: string;
 
   @Column({
     name: 'address',
   })
-  private _address: string;
+  address: string;
 
   @CreateDateColumn({
     name: 'created_at',
   })
-  private _createdAt: Date;
+  createdAt: Date;
 
   @UpdateDateColumn({
     name: 'updated_at',
   })
-  private _updatedAt: Date;
+  updatedAt: Date;
 
   @DeleteDateColumn({
     name: 'deleted_at',
   })
-  private _deletedAt: Date;
+  deletedAt: Date;
 
   /**
    * Seller 인스턴스를 생성한다.
@@ -61,29 +61,26 @@ export class Seller {
    */
   static of(name: string, address: string, account: Account): Seller {
     const seller = new Seller();
-    seller._name = name;
-    seller._address = address;
-    seller._account = account;
+    seller.name = name;
+    seller.address = address;
+    seller.account = account;
     return seller;
   }
 
-  get id(): bigint {
-    return this._id;
-  }
+  /**
+   * 판매자 정보를 수정한다.
+   *
+   * @param {string} [name]
+   * @param {string} [address]
+   * @memberof Customer
+   */
+  update(name?: string, address?: string) {
+    if (name) {
+      this.name = name;
+    }
 
-  get products(): Product[] {
-    return this._products;
-  }
-
-  get name(): string {
-    return this._name;
-  }
-
-  get address(): string {
-    return this._address;
-  }
-
-  get account(): Account {
-    return this._account;
+    if (address) {
+      this.address = address;
+    }
   }
 }

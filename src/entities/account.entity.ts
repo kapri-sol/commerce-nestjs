@@ -19,51 +19,51 @@ export class Account {
   @PrimaryGenerateBigintColumn({
     name: 'id',
   })
-  private _id: bigint;
+  id: bigint;
 
   @OneToOne(() => Customer, (customer: Customer) => customer.account)
   @JoinColumn({
     name: 'customer_id',
   })
-  private _customer: Customer;
+  customer: Customer;
 
   @OneToOne(() => Seller, (seller: Seller) => seller.account)
   @JoinColumn({
     name: 'seller_id',
   })
-  private _seller: Seller;
+  seller: Seller;
 
   @Column({
     name: 'email',
     unique: true,
   })
-  private _email: string;
+  email: string;
 
   @Column({
     name: 'phone',
     unique: true,
   })
-  private _phone: string;
+  phone: string;
 
   @Column({
     name: 'password',
   })
-  private _password: string;
+  password: string;
 
   @CreateDateColumn({
     name: 'created_at',
   })
-  private _createdAt: Date;
+  createdAt: Date;
 
   @UpdateDateColumn({
     name: 'updated_at',
   })
-  private _updatedAt: Date;
+  updatedAt: Date;
 
   @DeleteDateColumn({
     name: 'deleted_at',
   })
-  private _deletedAt: Date;
+  deletedAt: Date;
 
   /**
    * Account 인스턴스를 생성한다.
@@ -77,38 +77,10 @@ export class Account {
    */
   static of(email: string, phone: string, password: string): Account {
     const account = new Account();
-    account._email = email;
-    account._phone = phone;
-    account._password = password;
+    account.email = email;
+    account.phone = phone;
+    account.password = password;
     return account;
-  }
-
-  get id() {
-    return this._id;
-  }
-
-  get customer(): Customer {
-    return this._customer;
-  }
-
-  set customer(customer: Customer) {
-    this._customer = customer;
-  }
-
-  get seller(): Seller {
-    return this._seller;
-  }
-
-  get email() {
-    return this._email;
-  }
-
-  get phone() {
-    return this._phone;
-  }
-
-  get password() {
-    return this._password;
   }
 
   /**
@@ -120,7 +92,7 @@ export class Account {
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword(roundOrSecret = 10) {
-    this._password = await bcrypt.hashSync(this.password, roundOrSecret);
+    this.password = await bcrypt.hashSync(this.password, roundOrSecret);
   }
 
   /**
@@ -131,7 +103,7 @@ export class Account {
    * @memberof Account
    */
   validatePassword(password: string) {
-    return bcrypt.compare(password, this._password);
+    return bcrypt.compare(password, this.password);
   }
 
   /**
@@ -143,11 +115,11 @@ export class Account {
    */
   update(phone?: string, password?: string) {
     if (phone) {
-      this._phone = phone;
+      this.phone = phone;
     }
 
     if (password) {
-      this._password = password;
+      this.password = password;
     }
   }
 }

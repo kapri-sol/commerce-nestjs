@@ -17,41 +17,41 @@ export class Customer {
   @PrimaryGenerateBigintColumn({
     name: 'id',
   })
-  private _id: bigint;
+  id: bigint;
 
   @OneToOne(() => Account, (account: Account) => account.customer)
-  private _account: Account;
+  account: Account;
 
   @OneToMany(() => Product, (product) => product.seller)
-  private _products: Product[];
+  products: Product[];
 
   @OneToMany(() => Order, (order: Order) => order.customer)
-  private _orders: Order[];
+  orders: Order[];
 
   @Column({
     name: 'name',
   })
-  private _name: string;
+  name: string;
 
   @Column({
     name: 'address',
   })
-  private _address: string;
+  address: string;
 
   @CreateDateColumn({
     name: 'created_at',
   })
-  private _created_at: Date;
+  createdAt: Date;
 
   @UpdateDateColumn({
     name: 'updated_at',
   })
-  private _updated_at: Date;
+  updatedAt: Date;
 
   @DeleteDateColumn({
     name: 'deleted_at',
   })
-  private _deleted_at: Date;
+  deletedAt: Date;
 
   /**
    * Customer 인스턴스를 생성한다.
@@ -65,38 +65,10 @@ export class Customer {
    */
   static of(name: string, address: string, account: Account) {
     const customer = new Customer();
-    customer._name = name;
-    customer._address = address;
-    customer._account = account;
+    customer.name = name;
+    customer.address = address;
+    customer.account = account;
     return customer;
-  }
-
-  get id() {
-    return this._id;
-  }
-
-  get account() {
-    return this._account;
-  }
-
-  set account(account: Account) {
-    this._account = account;
-  }
-
-  get products(): Product[] {
-    return this._products;
-  }
-
-  get name() {
-    return this._name;
-  }
-
-  get address() {
-    return this._address;
-  }
-
-  get orders(): Order[] {
-    return this._orders;
   }
 
   /**
@@ -108,11 +80,11 @@ export class Customer {
    */
   update(name?: string, address?: string) {
     if (name) {
-      this._name = name;
+      this.name = name;
     }
 
     if (address) {
-      this._address = address;
+      this.address = address;
     }
   }
 }

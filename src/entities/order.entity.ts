@@ -46,22 +46,6 @@ export class Order {
   })
   deletedAt: Date;
 
-  // get id(): bigint {
-  //   return this._id;
-  // }
-
-  // get orderItems(): OrderItem[] {
-  //   return this._orderItems;
-  // }
-
-  // set orderItems(orderItesms: OrderItem[]) {
-  //   this._orderItems = orderItesms;
-  // }
-
-  // get customer(): Customer {
-  //   return this._customer;
-  // }
-
   /**
    * 주문 인스턴스를 생성한다.
    *
