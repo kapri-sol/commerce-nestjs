@@ -22,6 +22,8 @@ describe('Account Service', () => {
   let backup: IBackup;
   let app: INestApplication;
   let accountRepository: Repository<Account>;
+  let customerRepository: Repository<Customer>;
+  let sellerRepository: Repository<Seller>;
   let accountQueryRepository: AccountQueryRepository;
   let accountService: AccountService;
 
@@ -33,6 +35,26 @@ describe('Account Service', () => {
     );
 
     return accountRepository.save(account);
+  };
+
+  const initializeCustomer = async (account: Account) => {
+    const customer = Customer.of(
+      faker.name.fullName(),
+      faker.address.streetAddress(),
+      account,
+    );
+
+    return customerRepository.save(customer);
+  };
+
+  const initializeSeller = async (account: Account) => {
+    const seller = Seller.of(
+      faker.name.fullName(),
+      faker.address.streetAddress(),
+      account,
+    );
+
+    return sellerRepository.save(seller);
   };
 
   beforeAll(async () => {
@@ -62,6 +84,8 @@ describe('Account Service', () => {
     app = module.createNestApplication();
 
     accountRepository = datasource.getRepository(Account);
+    customerRepository = datasource.getRepository(Customer);
+    sellerRepository = datasource.getRepository(Seller);
     accountQueryRepository = module.get<AccountQueryRepository>(
       AccountQueryRepository,
     );
@@ -106,6 +130,42 @@ describe('Account Service', () => {
       expect(findAccount.email).toBe(account.email);
       expect(findAccount.phone).toBe(account.phone);
       expect(findAccount.password).toBe(account.password);
+    });
+
+    it('id로 계정과 고객을 검색한다.', async () => {
+      const account = await initializeAccount();
+      const customer = await initializeCustomer(account);
+
+      // when
+      const findAccount = await accountService.findAccountWithCustomerById(
+        account.id,
+      );
+
+      expect(findAccount.id).toBe(account.id);
+      expect(findAccount.email).toBe(account.email);
+      expect(findAccount.phone).toBe(account.phone);
+      expect(findAccount.password).toBe(account.password);
+      expect(findAccount.customer.id).toBe(customer.id);
+      expect(findAccount.customer.name).toBe(customer.name);
+      expect(findAccount.customer.address).toBe(customer.address);
+    });
+
+    it('id로 계정과 판매자를 검색한다.', async () => {
+      const account = await initializeAccount();
+      const seller = await initializeSeller(account);
+
+      // when
+      const findAccount = await accountService.findAccountWithSellerById(
+        account.id,
+      );
+
+      expect(findAccount.id).toBe(account.id);
+      expect(findAccount.email).toBe(account.email);
+      expect(findAccount.phone).toBe(account.phone);
+      expect(findAccount.password).toBe(account.password);
+      expect(findAccount.seller.id).toBe(seller.id);
+      expect(findAccount.seller.name).toBe(seller.name);
+      expect(findAccount.seller.address).toBe(seller.address);
     });
 
     it('email로 계정을 검색한다.', async () => {

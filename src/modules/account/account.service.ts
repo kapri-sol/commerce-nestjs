@@ -35,7 +35,9 @@ export class AccountService {
    * @memberof AccountService
    */
   async findAccountById(accountId: bigint): Promise<Account> {
-    const account = await this.accountQueryRepository.findOneById(accountId);
+    const account = await this.accountRepository.findOneBy({
+      id: accountId,
+    });
 
     if (!account) {
       throw new NotFoundException();
@@ -52,7 +54,53 @@ export class AccountService {
    * @memberof AccountService
    */
   async findAccountByEmail(email: string): Promise<Account> {
-    const account = await this.accountQueryRepository.findOneByEmail(email);
+    const account = await this.accountRepository.findOneBy({
+      email,
+    });
+
+    if (!account) {
+      throw new NotFoundException();
+    }
+
+    return account;
+  }
+
+  /**
+   * 계정과 고객을 계정 id로 검색한다.
+   *
+   * @param {bigint} accountId
+   * @return {*}  {Promise<Account>}
+   * @memberof AccountService
+   */
+  async findAccountWithCustomerById(accountId: bigint) {
+    const account = await this.accountRepository.findOne({
+      where: {
+        id: accountId,
+      },
+      relations: ['customer'],
+    });
+
+    if (!account) {
+      throw new NotFoundException();
+    }
+
+    return account;
+  }
+
+  /**
+   * 계정과 고객을 계정 id로 검색한다.
+   *
+   * @param {bigint} accountId
+   * @return {*}  {Promise<Account>}
+   * @memberof AccountService
+   */
+  async findAccountWithSellerById(accountId: bigint) {
+    const account = await this.accountRepository.findOne({
+      where: {
+        id: accountId,
+      },
+      relations: ['seller'],
+    });
 
     if (!account) {
       throw new NotFoundException();
