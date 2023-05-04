@@ -2,16 +2,15 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Customer } from '@src/entities/customer.entity';
 import { Repository } from 'typeorm';
-import { AccountQueryRepository } from '../account/account.query-repository';
-import { CustomerQueryRepository } from './customer.query-repository';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { Account } from '@src/entities/account.entity';
 
 @Injectable()
 export class CustomerService {
   constructor(
-    private readonly accountQueryRepository: AccountQueryRepository,
-    private readonly customerQueryRepository: CustomerQueryRepository,
+    @InjectRepository(Account)
+    private readonly accountRepository: Repository<Account>,
     @InjectRepository(Customer)
     private readonly customerRepository: Repository<Customer>,
   ) {}
@@ -23,11 +22,19 @@ export class CustomerService {
    * @return {*}  {Promise<bigint>}
    * @memberof CustomerService
    */
-  async createCustomer(createCustomerDto: CreateCustomerDto): Promise<bigint> {
+  async createCustomer(
+    accountId: bigint,
+    createCustomerDto: CreateCustomerDto,
+  ): Promise<bigint> {
     const { name, address } = createCustomerDto;
-    const account = await this.accountQueryRepository.findOneById(
-      createCustomerDto.accountId,
-    );
+
+    const account = await this.accountRepository.findOneBy({
+      id: accountId,
+    });
+
+    if (!account) {
+      throw new NotFoundException();
+    }
 
     const customer = Customer.of(name, address, account);
 
@@ -44,7 +51,9 @@ export class CustomerService {
    * @memberof CustomerService
    */
   async findCustomerById(customerId: bigint): Promise<Customer> {
-    const customer = await this.customerQueryRepository.findOneById(customerId);
+    const customer = await this.customerRepository.findOneBy({
+      id: customerId,
+    });
 
     if (!customer) {
       throw new NotFoundException();
@@ -58,13 +67,16 @@ export class CustomerService {
    *
    * @param {bigint} customerId
    * @param {UpdateCustomerDto} updateCustomerDto
+   * @return {*}  {Promise<void>}
    * @memberof CustomerService
    */
   async updateCustomer(
     customerId: bigint,
     updateCustomerDto: UpdateCustomerDto,
-  ) {
-    const customer = await this.customerQueryRepository.findOneById(customerId);
+  ): Promise<void> {
+    const customer = await this.customerRepository.findOneBy({
+      id: customerId,
+    });
 
     if (!customer) {
       throw new NotFoundException();
@@ -84,7 +96,9 @@ export class CustomerService {
    * @memberof CustomerService
    */
   async removeCustomer(customerId: bigint) {
-    const customer = await this.customerQueryRepository.findOneById(customerId);
+    const customer = await this.customerRepository.findOneBy({
+      id: customerId,
+    });
 
     if (!customer) {
       throw new NotFoundException();
