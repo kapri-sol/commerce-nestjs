@@ -4,6 +4,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Account } from '@src/entities/account.entity';
 import { Customer } from '@src/entities/customer.entity';
+import { OrderItem } from '@src/entities/order-item.entity';
 import { Order } from '@src/entities/order.entity';
 import { Product } from '@src/entities/product.entity';
 import { Seller } from '@src/entities/seller.entity';
@@ -49,12 +50,18 @@ describe('Customer Service', () => {
   };
 
   beforeAll(async () => {
-    await getMemDateSource([Account, Customer, Product, Seller, Order]).then(
-      (data) => {
-        datasource = data.datasource;
-        backup = data.backup;
-      },
-    );
+    await getMemDateSource([
+      Account,
+      Customer,
+      Product,
+      Seller,
+      Order,
+      OrderItem,
+      Product,
+    ]).then((data) => {
+      datasource = data.datasource;
+      backup = data.backup;
+    });
 
     const module: TestingModule = await Test.createTestingModule({
       imports: [
@@ -97,12 +104,12 @@ describe('Customer Service', () => {
         {
           name: faker.name.fullName(),
           address: faker.address.streetAddress(),
-          accountId: account.id,
         },
       );
 
       // when
       const customerId = await customerService.createCustomer(
+        account.id,
         createCustomerDto,
       );
 
